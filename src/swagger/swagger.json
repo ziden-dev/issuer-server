@@ -6,129 +6,50 @@
   },
   "tags": [
     {
-      "name": "authen",
+      "name": "auth",
       "description": "API for authentication"
     },
     {
-      "name": "issuer-setup",
-      "description": "API for setup issuer server"
+      "name": "issuers",
+      "description": "API for issuers"
     },
     {
       "name": "claims",
-      "description": "API for claims"
+      "description": "API for Claims"
     },
     {
-      "name": "publish-revoke",
-      "description": "API for publish claims"
+      "name": "schemas",
+      "description": "API for schemas"
     },
     {
-      "name": "schema",
-      "description": "API for schema"
+      "name": "registries",
+      "description": "API for registries"
     },
     {
-      "name": "retrieve",
-      "description": "API for get raw data"
+      "name": "networks",
+      "description": "API for networks"
     }
   ],
   "paths": {
-    "/api/issuer-setup/setup-tree": {
+    "/api/auth/login/{issuerId}": {
       "post": {
         "tags": [
-          "issuer-setup"
+          "auth"
         ],
-        "summary": "(For Dev Only) API setup clean issuer tree",
-        "description": "(For Dev Only) API setup clean issuer tree",
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/issuer-setup/operator": {
-      "post": {
-        "tags": [
-          "issuer-setup"
-        ],
-        "security": [
+        "summary": "API login",
+        "description": "API login",
+        "parameters": [
           {
-            "Authorization": ["read", "write"]
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
-        "summary": "Add new operator (admin only)",
-        "description": "Add new operator (admin only)",
         "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "operatorId": {
-                    "type": "string",
-                    "example": "123456"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/issuer-setup/restore-last-state": {
-      "put": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "issuer-setup"
-        ],
-        "summary": "(For Admin Only) API restore last state",
-        "description": "(For Admin Only) API restore last state",
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/authen/login": {
-      "post": {
-        "tags": [
-          "authen"
-        ],
-        "summary": "API Login",
-        "description": "API for get jwz",
-        "requestBody": {
-          "description": "Your proof, public_signals, circuitId, schema, algorithm, payload",
           "content": {
             "application/json": {
               "schema": {
@@ -152,13 +73,24 @@
         }
       }
     },
-    "/api/authen/verify-token": {
+    "/api/authen/verify-token/{issuerId}": {
       "post": {
         "tags": [
-          "authen"
+          "auth"
         ],
         "summary": "API Verify Token",
         "description": "API Verify Token",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Your jwz token",
           "content": {
@@ -184,57 +116,21 @@
         }
       }
     },
-    "/api/schema": {
-      "get": {
-        "tags": [
-          "schema"
-        ],
-        "summary": "Get all schemas or get schema by schemaHash",
-        "description": "Get all schemas or get schema by schemaHash",
-        "parameters": [
-          {
-            "name": "schemaHash",
-            "in": "query",
-            "description": "find schema by schemaHash",
-            "schema": {
-              "type": "string",
-              "example": "123456789"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/api/issuers/register": {
       "post": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
         "tags": [
-          "schema"
+          "issuers"
         ],
-        "summary": "API create new Schema",
-        "description": "API create new Schema",
+        "summary": "Register new issuers",
+        "description": "Register new issuers",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Schema"
+                "$ref": "#/components/schemas/Holder"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "default": {
@@ -250,520 +146,29 @@
         }
       }
     },
-    "/api/retrieve": {
-      "get": {
+    "/api/issuers/{issuerId}/restore-last-state": {
+      "put": {
         "security": [
           {
             "Authorization": ["read", "write"]
           }
         ],
         "tags": [
-          "retrieve"
+          "issuers"
         ],
-        "summary": "Get claim raw data by claimId",
-        "description": "Get claim raw data by claimId",
+        "summary": "Restore last statetrantition",
+        "description": "API restore last statetrantition",
         "parameters": [
           {
-            "name": "claimId",
-            "in": "query",
-            "description": "get by ClaimId",
-            "schema": {
-              "type": "string",
-              "example": "123456"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims": {
-      "get": {
-        "tags": [
-          "claims"
-        ],
-        "summary": "Get all claimId and status",
-        "description": "Get all claimId and status",
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClaimStatusArrayResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/authen": {
-      "get": {
-        "tags": [
-          "claims"
-        ],
-        "summary": "Get authen claim by holderId",
-        "description": "Get authen claim by holderId",
-        "parameters": [
-          {
-            "name": "holderId",
-            "in": "query",
-            "description": "search by HolderId",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/registration": {
-      "post": {
-        "tags": [
-          "claims"
-        ],
-        "summary": "Registration claim",
-        "description": "Registration claim",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/issuance": {
-      "post": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "claims"
-        ],
-        "summary": "Issuance array claim",
-        "description": "Issuance array claim",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IssuanceData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/issuer-id": {
-      "get": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "claims"
-        ],
-        "summary": "API get Issuer Id",
-        "description": "API get Issuer Id",
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/{claimId}/proof": {
-      "get": {
-        "tags": [
-          "claims"
-        ],
-        "summary": "Query claim data for generate proof",
-        "description": "Query claim data for generate proof",
-        "parameters": [
-          {
-            "name": "claimId",
+            "name": "issuerId",
             "in": "path",
-            "description": "id of claim",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "description": "type in (mtp, nonRevMtp)",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "mtp",
-              "enum": [
-                "mtp",
-                "nonRevMtp"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/{claimId}/status": {
-      "get": {
-        "tags": [
-          "claims"
-        ],
-        "summary": "Query claim data for get claim status by claimId",
-        "description": "Query claim data for get claim status by claimId",
-        "parameters": [
-          {
-            "name": "claimId",
-            "in": "path",
-            "description": "id of claim",
+            "description": "issuerId",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/revoke-list": {
-      "post": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "Api to REVOKE ACTIVED Claim",
-        "description": "Api to REVOKE ACTIVED Claim",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RevokeList"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    
-    "/api/claims/challenge/publish": {
-      "get": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "API Get publishChallenge for signature",
-        "description": "API Get publishChallenge for signature",
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/challenge/revoke": {
-      "get": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "API Get revokeChallenge for signature",
-        "description": "API Get revokeChallenge for signature",
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/challenge/combine": {
-      "get": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "API Get combineChallenge for signature",
-        "description": "API Get combineChallenge for signature",
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/challenge": {
-      "post": {
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "(For Test Only) API get SignChallange for Publish API, Revoke API, Combine API",
-        "description": "(For Test Only) API get SignChallange for Publish API, Revoke API, Combine API. Before call this API, please get challenge corresponding",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Challenge"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/publish": {
-      "post": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "(For Dev Only) API Publish PENDING claims on db",
-        "description": "(For Dev Only) API Pushlish PENDING claims on db. Before call this API, please getSignChallenge corresponding",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignChallenge"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/revoke": {
-      "post": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "(For Dev Only) API Revoke PENDING_REVOKE claims on db",
-        "description": "(For Dev Only) API Revoke PENDING_REVOKE claims on db. Before call this API, please getSignChallenge corresponding",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignChallenge"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "API response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/claims/combine": {
-      "post": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
-        "tags": [
-          "publish-revoke"
-        ],
-        "summary": "(For Dev Only) API Publish PENDING claims and Revoke PENDING_REVOKE claims",
-        "description": "(For Dev Only) API Publish PENDING claims and Revoke PENDING_REVOKE claims. Before call this API, please getSignChallenge corresponding",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignChallenge"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "default": {
             "description": "API response",
@@ -784,7 +189,7 @@
       "APIResponse": {
         "type": "object",
         "properties": {
-          "status": {
+          "apiCode": {
             "type": "integer",
             "format": "int64"
           },
@@ -793,41 +198,6 @@
           },
           "data": {
             "type": "object"
-          }
-        }
-      },
-      "ClaimStatusArrayResponse": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "claimId": {
-                  "type": "string"
-                },
-                "status": {
-                  "type": "string"
-                },
-                "holderId": {
-                  "type": "string"
-                },
-                "schemaHash": {
-                  "type": "string"
-                },
-                "createAt": {
-                  "type": "integer"
-                }
-              }
-            }
           }
         }
       },
@@ -865,208 +235,16 @@
           }
         }
       },
-      "UserData": {
+      "Holder": {
         "type": "object",
         "properties": {
-          "holderId": {
+          "pubkeyX": {
             "type": "string",
-            "example": "12345"
+            "example": "1234"
           },
-          "schemaHash": {
+          "pubkeyY": {
             "type": "string",
-            "example": "34026444997966407455173871616257787521361155617631575393219926927966991955994"
-          },
-          "publicKey": {
-            "type": "array",
-            "items": {
-              "type": "integer"
-            },
-            "example": [
-              248,
-              222,
-              189,
-              44,
-              20,
-              232,
-              81,
-              196,
-              159,
-              210,
-              92,
-              4,
-              223,
-              184,
-              84,
-              211,
-              140,
-              184,
-              144,
-              80,
-              107,
-              28,
-              55,
-              138,
-              226,
-              183,
-              90,
-              31,
-              5,
-              195,
-              78,
-              13
-            ]
-          },
-          "data": {
-            "type": "object",
-            "example": {
-              "documentId": "id12345zyxt",
-              "documentType": "National ID",
-              "name": "Tuan",
-              "dateOfBirth": 20000101,
-              "nationality": 10,
-              "countryOfResidence": 10,
-              "address": "abc",
-              "zipCode5": "100",
-              "zipCodePlus4": "100"
-            }
-          }
-        }
-      },
-      "IssuanceData": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "holderId": {
-              "type": "string",
-              "example": "12345"
-            },
-            "schemaHash": {
-              "type": "string",
-              "example": "34026444997966407455173871616257787521361155617631575393219926927966991955994"
-            },
-            "data": {
-              "type": "object",
-              "example": {
-                "documentId": "id12345zyxt",
-                "documentType": "National ID",
-                "name": "Tuan",
-                "dateOfBirth": 20000101,
-                "nationality": 10,
-                "countryOfResidence": 10,
-                "address": "abc",
-                "zipCode5": "100",
-                "zipCodePlus4": "100"
-              }
-            }
-          }
-        }
-      },
-      "RevokeList": {
-        "type": "object",
-        "properties": {
-          "revNonces": {
-            "type": "array",
-            "example": [10, 11, 12]
-          }
-        }
-      },
-      "StatusChange": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "default": "REJECT",
-            "enum": [
-              "REJECT",
-              "PENDING"
-            ]
-          }
-        }
-      },
-      "Challenge": {
-        "type": "object",
-        "properties": {
-          "challenge": {
-            "type": "string",
-            "example": "2101161577681291238529280264703639496358080169515952608708589558013231430525"
-          }
-        }
-      },
-      "SignChallenge": {
-        "type": "object", 
-        "properties": {
-          "signature": {
-            "type": "object",
-            "properties": {
-              "challenge": {
-                "type": "string",
-                "example": "2101161577681291238529280264703639496358080169515952608708589558013231430525"
-              },
-              "challengeSignatureR8x": {
-                "type": "string",
-                "example": "11890003505821740942342827466490219951374204720747371650777335503316016714756"
-              },
-              "challengeSignatureR8y": {
-                "type": "string",
-                "example": "4572047267382586032939239839765622365092726649604288788632301595003251991693"
-              },
-              "challengeSignatureS": {
-                "type": "string",
-                "example": "2655604807051308811171436613928479239441325277756998151249502848413329977634"
-              }
-            }
-          }
-        }
-      },
-      "Schema": {
-        "type": "object",
-        "properties": {
-          "registry": {
-            "type": "object",
-            "properties": {
-              "description": {
-                "type": "string"
-              },
-              "expiration": {
-                "type": "integer"
-              },
-              "updatable": {
-                "type": "boolean"
-              },
-              "network": {
-                "type": "string"
-              }
-            }
-          },
-          "schema": {
-            "type": "object",
-            "properties": {
-              "title": {
-                "type": "string"
-              },
-              "properties": {
-                "type": "object"
-              },
-              "index": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "value": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "required": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
+            "example": "1234"
           }
         }
       }

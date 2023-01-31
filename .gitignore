@@ -111,3 +111,5 @@ package-lock.json
 
 secret.json
 
+db/**
+

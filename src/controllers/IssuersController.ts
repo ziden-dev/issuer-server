@@ -38,6 +38,12 @@ export class IssuerController {
 
     public async addNewOperator(req: Request, res: Response) {
         try {
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("IssuerId invalid!");
+            }
+
+            
 
         } catch (err: any) {
             console.log(err);

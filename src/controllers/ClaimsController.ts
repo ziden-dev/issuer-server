@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
+import { getChallengePublishAllClaims, getChallengeRevokeAllPendingRevoke, getCombinesChallenge as getCombineChallenge } from "../services/Challenge.js";
+import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.js";
+import { serializaData } from "../util/utils.js";
+import { claim as zidenjsClaim } from "zidenjs";
+import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
@@ -67,27 +72,84 @@ export class ClaimsController {
         }
     }
 
-    public async getPublishChallange(req: Request, res: Response) {
+    public async getPublishChallenge(req: Request, res: Response) {
         try {
-
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            await changeLockTreeState(issuerId, true);
+            try {
+                const challenge = await getChallengePublishAllClaims(issuerId);
+                res.send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, JSON.parse(serializaData({ challenge: challenge })), ResultMessage.APISUCCESS.message)
+                );
+                await changeLockTreeState(issuerId, false);
+                return;
+            } catch (err: any) {
+                await changeLockTreeState(issuerId, false);
+                throw(err);
+            }
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
-    public async getRevokeChallange(req: Request, res: Response) {
+    public async getRevokeChallenge(req: Request, res: Response) {
         try {
-
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            await changeLockTreeState(issuerId, true);
+            try {
+                const challenge = await getChallengeRevokeAllPendingRevoke(issuerId);
+                res.send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, JSON.parse(serializaData({ challenge: challenge })), ResultMessage.APISUCCESS.message)
+                );
+                await changeLockTreeState(issuerId, false);
+                return;
+            } catch (err: any) {
+                await changeLockTreeState(issuerId, false);
+                throw(err);
+            }
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
-    public async getCombinedChallange(req: Request, res: Response) {
+    public async getCombineChallenge(req: Request, res: Response) {
         try {
-
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            await changeLockTreeState(issuerId, true);
+            try {
+                const challenge = await getCombineChallenge(issuerId);
+                res.send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, JSON.parse(serializaData({ challenge: challenge })), ResultMessage.APISUCCESS.message)
+                );
+                await changeLockTreeState(issuerId, false);
+                return;
+            } catch (err: any) {
+                await changeLockTreeState(issuerId, false);
+                throw(err);
+            }
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -96,7 +158,38 @@ export class ClaimsController {
 
     public async publishClaims(req: Request, res: Response) {
         try {
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            const {signature} = req.body;
+            if (!signature
+                || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
+                throw("Invalid signature");
+            }
+            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+                challenge: BigInt(signature["challenge"]),
+                challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
+                challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
+                challengeSignatureS: BigInt(signature["challengeSignatureS"])
+            }
 
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            await changeLockTreeState(issuerId, true);
+            try {
+                await publishOnly(signChallenge, issuerId);
+                res.send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message)
+                );
+                await changeLockTreeState(issuerId, false);
+                return;
+            } catch (err: any) {
+                await changeLockTreeState(issuerId, false);
+                throw(err);
+            }        
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -105,7 +198,39 @@ export class ClaimsController {
 
     public async revokeClaims(req: Request, res: Response) {
         try {
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            const {signature} = req.body;
+            if (!signature
+                || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
+                throw("Invalid signature");
+            }
+            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+                challenge: BigInt(signature["challenge"]),
+                challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
+                challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
+                challengeSignatureS: BigInt(signature["challengeSignatureS"])
+            }
 
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            await changeLockTreeState(issuerId, true);
+            try {
+                await revokeOnly(signChallenge, issuerId);
+                res.send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message)
+                );
+                await changeLockTreeState(issuerId, false);
+                return;
+            } catch (err: any) {
+                await changeLockTreeState(issuerId, false);
+                throw(err);
+            }        
+        
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -114,7 +239,39 @@ export class ClaimsController {
 
     public async publishAndRevokeClaims(req: Request, res: Response) {
         try {
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            const {signature} = req.body;
+            if (!signature
+                || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
+                throw("Invalid signature");
+            }
+            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+                challenge: BigInt(signature["challenge"]),
+                challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
+                challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
+                challengeSignatureS: BigInt(signature["challengeSignatureS"])
+            }
 
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            await changeLockTreeState(issuerId, true);
+            try {
+                await publishAndRevoke(signChallenge, issuerId);
+                res.send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message)
+                );
+                await changeLockTreeState(issuerId, false);
+                return;
+            } catch (err: any) {
+                await changeLockTreeState(issuerId, false);
+                throw(err);
+            }        
+        
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));

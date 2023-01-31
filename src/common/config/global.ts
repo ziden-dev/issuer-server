@@ -15,8 +15,8 @@ export class GlobalVariables {
 
     public static async init(): Promise<void> {
         await zidenjsParams.setupParams();
-        let params = zidenjsParams.getZidenParams()
-        GlobalVariables.hasher = params.hasher
+        let params = zidenjsParams.getZidenParams();
+        GlobalVariables.hasher = params.hasher;
         GlobalVariables.F = params.F;
         GlobalVariables.hash0 = params.hash0;
         GlobalVariables.hash1 = params.hash1;

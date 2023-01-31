@@ -19,9 +19,9 @@ export class ClaimsRouters {
         this.router.post("/request/:issuerId", this.claimsController.requestNewClaim);
         this.router.post("/issue/:issuerId", this.authenController.authorization, this.claimsController.issueListClaims);
         this.router.post("/revoke-list/:issuerId", this.authenController.authorization, this.claimsController.revokeListClaims);
-        this.router.get("/publish-challenge/:issuerId", this.authenController.authorization, this.claimsController.getPublishChallange);
-        this.router.get("/revoke-challenge/:issuerId", this.authenController.authorization, this.claimsController.getRevokeChallange);
-        this.router.get("/combined-challenge/:issuerId", this.authenController.authorization, this.claimsController.getCombinedChallange);
+        this.router.get("/publish-challenge/:issuerId", this.authenController.authorization, this.claimsController.getPublishChallenge);
+        this.router.get("/revoke-challenge/:issuerId", this.authenController.authorization, this.claimsController.getRevokeChallenge);
+        this.router.get("/combined-challenge/:issuerId", this.authenController.authorization, this.claimsController.getCombineChallenge);
         this.router.get("/publish-challenge/:issuerId", this.authenController.authorization, this.claimsController.publishClaims);
         this.router.post("/publish/:issuerId", this.authenController.authorizationAdmin, this.claimsController.publishClaims);
         this.router.post("/revoke/:issuerId", this.authenController.authorizationAdmin, this.claimsController.revokeClaims);

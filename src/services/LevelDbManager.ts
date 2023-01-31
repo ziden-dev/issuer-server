@@ -10,6 +10,7 @@ export async function createNewLevelDb(id: string) {
         const claimsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/claims`);
         const revocationDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/revocation`);
         const rootsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/roots`);
+        
         return {pathLevelDb, claimsDb, revocationDb, rootsDb};
     } catch (err: any) {
         throw (err);
@@ -35,11 +36,27 @@ export async function openLevelDb(src: string) {
     
 }
 
-export async function copyDb(src: string, dis: string) {
+export async function copyDb(src: string, des: string) {
     try {
-        fs.removeSync(dis);
-        fs.copySync(src, dis);
+        fs.removeSync(des);
+        fs.copySync(src, des);
     } catch (err: any) {
         throw(err);
     }
+}
+
+export async function cloneDb(path: string) {
+    copyDb(path + "/" + levelDbSrc, path + "/" + levelDbSrcClone);
+}
+
+export async function restoreDb(path: string) {
+    copyDb(path + "/" + levelDbSrcClone, path + "/" + levelDbSrc);
+}
+
+export async function backupLastState(path: string) {
+    copyDb(path + "/" + levelDbSrc, path + "/" + levelDbStateBackup);
+}
+
+export async function restoreLastStateTratition(path: string) {
+    copyDb(path + "/" + levelDbStateBackup, path + "/" + levelDbSrc);
 }

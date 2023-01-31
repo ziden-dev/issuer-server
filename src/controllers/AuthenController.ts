@@ -33,7 +33,7 @@ export class AuthenController {
             proof: proof,
             public_signals: public_signals
           }
-          let isValid = await token.verifyProof(vk)
+          let isValid = await token.verifyProof(vk);
           if (isValid) {
             let compressedToken = token.compress();
             res.send(buildResponse(200, { token: compressedToken }, "Login successful"));

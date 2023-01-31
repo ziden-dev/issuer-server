@@ -54,3 +54,12 @@ export async function getIssuerIdByPublicKey(pubkeyX: string, pubkeyY: string) {
     }
     return issuer.issuerId!;
 }
+
+export async function checkIssuerExisted(pubkeyX: string, pubkeyY: string) {
+    const issuer = await Issuer.findOne({pubkeyX: pubkeyX, pubkeyY: pubkeyY});
+    if (!issuer) {
+        return false;
+    } else {
+        return true;
+    }
+}

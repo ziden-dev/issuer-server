@@ -17,8 +17,9 @@ import { ClaimsRouters } from './routers/claimsRoutes.js';
 import { SchemasRouter } from './routers/schemasRoutes.js';
 import { RegistriesRoutes } from './routers/registriesRoutes.js';
 import { NetWorkRoutes } from './routers/networksRoutes.js';
+import { setupAuthenTree } from './services/TreeState.js';
 
-const swaggerDocument = JSON.parse(readFileSync("swagger/swagger.json", "utf-8"));
+const swaggerDocument = JSON.parse(readFileSync("src/swagger/swagger.json", "utf-8"));
 
 dotenv.config();
 
@@ -111,6 +112,7 @@ async function startServer(): Promise<void> {
   await GlobalVariables.init();
   const server = new Server();
   server.start();
+  setupAuthenTree();
 }
 
 startServer();

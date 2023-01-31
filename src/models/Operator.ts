@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const Operator = new mongoose.Schema({
     userId: String,
-    role: String,
+    role: Number,
     claimId: String,
-    createAt: String,
+    createAt: Number,
     issuerId: String,
     activate: Boolean
 });
