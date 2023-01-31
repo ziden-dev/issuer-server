@@ -6,7 +6,7 @@ export class NetWorkRoutes {
     public router: Router;
     public authenController = new AuthenController();
     public networksController = new NetworkController();
-    constructor () {
+    constructor() {
         this.router = Router();
         this.routers();
     }
@@ -14,7 +14,7 @@ export class NetWorkRoutes {
     routers(): void {
         this.router.post("", this.networksController.createNewNetwork);
         this.router.get("", this.networksController.getAllNetworks);
-        this.router.post("/:networkId", this.networksController.getNetworkById);
+        this.router.get("/:networkId", this.networksController.getNetworkById);
         this.router.put("/:networkId", this.networksController.updateNetworkConfig);
         this.router.delete("/:networkId", this.networksController.removeNetwork);
 
