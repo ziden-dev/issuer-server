@@ -17,7 +17,7 @@ export async function publishOnly(signature:  zidenjsClaim.authClaim.SignedChall
     const claimIds: Array<string> = claims.map(claim => {
         return claim.id!;
     });
-    if (claimIds.length != 0) {
+    if (claimIds.length == 0) {
         return;
     }
 
@@ -130,14 +130,15 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
         // Generate proof
         const statePath = "build/stateTransition"
         const rapidSnarkPath = "build/rapidSnark"
-        fs.writeFileSync(`${statePath}/input.json`, (serializaData(stateTransitionInputs)));
+        const rand = Date.now().toString();
+        fs.writeFileSync(`${statePath}/${rand}input.json`, (serializaData(stateTransitionInputs)));
         // execSync(`npx snarkjs calculatewitness ${statePath}/stateTransition.wasm ${statePath}/input.json ${statePath}/witness.wtns`)
         // execSync(`npx snarkjs groth16 prove ${statePath}/state_final.zkey ${statePath}/witness.wtns ${statePath}/proof.json ${statePath}/public.json`)
-        execSync(`${statePath}/stateTransition ${statePath}/input.json ${statePath}/witness.wtns`);
-        execSync(`${rapidSnarkPath}/prover ${statePath}/state_final.zkey ${statePath}/witness.wtns ${statePath}/proof.json ${statePath}/public.json`)
+        execSync(`${statePath}/stateTransition ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`);
+        execSync(`${rapidSnarkPath}/prover ${statePath}/state_final.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
 
         // Prepare calldata for transitState 
-        const out = execSync(`snarkjs zkey export soliditycalldata ${statePath}/public.json ${statePath}/proof.json`, { "encoding": "utf-8" }).toString().split(',').map(e => {
+        const out = execSync(`snarkjs zkey export soliditycalldata ${statePath}/${rand}public.json ${statePath}/${rand}proof.json`, { "encoding": "utf-8" }).toString().split(',').map(e => {
             return e.replace(/([\[\]\s\"])/g, "")
         })
         console.log(out);
@@ -158,6 +159,15 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
         const transitState = await state.connect(wallet).functions.transitState(publicSig[0], publicSig[1], publicSig[2], publicSig[3], a, b, c, { gasLimit: 3000000 });
         const tx = await transitState.wait();
         console.log(tx.events[0].event == "StateUpdated");
+        try {
+            fs.unlinkSync(`${statePath}/${rand}witness.wtns`);
+            fs.unlinkSync(`${statePath}/${rand}proof.json`);
+            fs.unlinkSync(`${statePath}/${rand}public.json`);
+            fs.unlinkSync(`${statePath}/${rand}input.json`);    
+        } catch (err) {
+            console.log(err);
+        }
+        
         if (tx.events[0].event == "StateUpdated") {
             await saveTreeState(issuerTree);
             await backupLastState(issuer.pathDb!);

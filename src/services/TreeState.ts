@@ -121,11 +121,10 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
     }
 
     await lockTree(serverIssuerId);
-
+    const id = v4();
+    const {pathLevelDb, claimsDb, revocationDb, rootsDb} = await createNewLevelDb(id);
+    
     try {
-
-        const id = v4();
-        const {pathLevelDb, claimsDb, revocationDb, rootsDb} = await createNewLevelDb(id);
     
         const newIssuerAuthClaim = await zidenjsClaim.authClaim.newAuthClaimFromPublicKey(BigInt(pubkeyX), BigInt(pubkeyY));
         const newIssuerTree = await zidenjsTrees.Trees.generateID(
@@ -172,12 +171,15 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
             hv: newIssuerAdminClaim.hv().toString(),
             schemaHash: authenSchemaHash,
             expiration: Number(newIssuerAdminClaim.getExpirationDate()),
+            updatable: false,
             version: Number(newIssuerAdminClaim.getVersion().toString()),
             revNonce: Number(newIssuerAdminClaim.getRevocationNonce()),
+            createAt: Number(Date.now()),
             status: ClaimStatus.ACTIVE,
             userId: zidenjsUtils.bufferToHex(newIssuerTree.userID),
             proofType: ProofType.MTP,
             issuerId: zidenjsUtils.bufferToHex(serverAuthenTree.issuerTree.userID),
+            schemaRegistryId: "",
         });
     
         await newClaim.save();
@@ -190,7 +192,7 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
         }
 
         await closeLevelDb(serverAuthenTree.claimsDb, serverAuthenTree.revocationDb, serverAuthenTree.rootsDb);
-
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return {
             issuerId: zidenjsUtils.bufferToHex(newIssuerTree.userID),
             claimId: newClaim.id,
@@ -199,6 +201,7 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
         };
     } catch (err: any) {
         await unlockTree(serverIssuerId);
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }

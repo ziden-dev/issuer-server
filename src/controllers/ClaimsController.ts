@@ -7,6 +7,8 @@ import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.j
 import { serializaData } from "../util/utils.js";
 import { claim as zidenjsClaim } from "zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
+import { getClaimByClaimId, getNonRevQueryMTPInput, getQueryMTPInput } from "../services/Claim.js";
+import { ProofTypeQuery } from "../common/enum/EnumType.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
@@ -20,7 +22,27 @@ export class ClaimsController {
 
     public async generateProof(req: Request, res: Response) {
         try {
+            const id = req.params["claimId"];
+            const type = req.query["type"];
+            if (!id) {
+                throw("Invalid claimId!");
+            }
 
+            const claim = await getClaimByClaimId(id);
+
+            let queryResponse = {};
+
+            if (type == ProofTypeQuery.MTP) {
+                queryResponse = await getQueryMTPInput(claim.issuerId, claim.hi);
+            }
+
+            if (type == ProofTypeQuery.NON_REV_MTP) {
+                queryResponse = await getNonRevQueryMTPInput(claim.issuerId, claim.revNonce);
+            }
+
+            res.send(
+                buildResponse(ResultMessage.APISUCCESS.apiCode, queryResponse, ResultMessage.APISUCCESS.message)
+            );
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));

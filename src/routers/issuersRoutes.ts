@@ -16,7 +16,7 @@ export class IssuerRooutes {
         this.router.put("/:issuerId/restore-last-state", this.authenController.authorizationAdmin, this.issuerController.restoreLastState);
         this.router.post("/:issuerId/operators", this.authenController.authorizationAdmin, this.issuerController.addNewOperator);
         this.router.delete("/:issuerId/operators/:operatorId", this.authenController.authorizationAdmin, this.issuerController.deleteOperator);
-        this.router.get("/:issuerId/operators/:operatorId", this.authenController.authorizationAdmin, this.issuerController.getOperatorInfor);
+        this.router.get("/:issuerId/operators/:operatorId", this.issuerController.getOperatorInfor);
         this.router.get("/:issuerId/operators", this.authenController.authorizationAdmin, this.issuerController.getListOperator);
     }
 }
