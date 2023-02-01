@@ -9,6 +9,8 @@ import { claim as zidenjsClaim } from "zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
 import { getClaimByClaimId, getClaimStatus, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
+import Schema from "../models/Schema.js";
+import { createNewSchema } from "../services/Schema.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {

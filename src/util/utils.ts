@@ -1,5 +1,6 @@
 import { utils as zidenjsUtils, claim as zidenjsClaim, claim } from "zidenjs";
 import fs, { readFileSync } from "fs";
+import { GlobalVariables } from "../common/config/global.js";
 
 export function serializaData(data: Object): string {
     return JSON.stringify(data, (key, value) =>
@@ -148,4 +149,18 @@ export async function b64ToBlob(b64Data: string, contentType: string = '', slice
 
     const blob = new Blob(byteArrays, {type: contentType});
     return blob;
+}
+
+export function checkInEnum(x: any, y: any) {
+    return Object.values(y).includes(x as typeof y);
+}
+
+export function getSchemaHashFromSchema(schema: any) {
+    let hashData = GlobalVariables
+    .F.toObject(GlobalVariables.hasher([BigInt(zidenjsUtils.stringToHex(JSON.stringify(schema)))]))
+    .toString(2);
+  let bitRemove = hashData.length < 128 ? 0 : hashData.length - 128;
+  let hashDataFixed = BigInt('0b' + hashData.slice(0, hashData.length - bitRemove));
+  let value = BigInt(hashDataFixed);
+  return value.toString();
 }

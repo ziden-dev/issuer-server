@@ -883,6 +883,37 @@
           }
         }
       }
+    },
+    "/api/schemas": {
+      "post": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "API create Schemas",
+        "description": "API create Schemas",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Schema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -998,6 +1029,23 @@
           "shotName": {
             "type": "string",
             "name": "shotName"
+          }
+        }
+      },
+      "Schema": {
+        "type": "object",
+        "properties": {
+          "@name": {
+            "type": "string"
+          },
+          "@type": {
+            "type": "string"
+          },
+          "@context": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
