@@ -102,3 +102,44 @@ export async function getNonRevQueryMTPInput(issuerId: string, revNonce: number)
         throw(err);
     }
 }
+
+export async function queryClaim( issuerId: string, status: Array<string>, holderId: string, schemaHash: string) {
+    let query: any = {};
+    if (issuerId != "") {
+        query["issuerId"] = issuerId;
+    }
+    if (status.length != 0) {
+        query["status"] = {"$in": status};
+    }
+    if (holderId != "") {
+        query["userId"] = holderId;
+    }
+    if (schemaHash != "") {
+        query["schemaHash"] = schemaHash;
+    }
+
+    const claims = await Claim.find(query);
+    const claimsResponse: Array<any> = [];
+
+    for (let i = 0; i < claims.length; i++) {
+        claimsResponse.push({
+            claimId: claims[i].id,
+            status: claims[i].status,
+            holderId: claims[i].userId,
+            issuerId: claims[i].issuerId,
+            schemaHash: claims[i].schemaHash,
+            createAt: claims[i].createAt,
+            revNonce: claims[i].revNonce
+        });
+    }
+
+    return claimsResponse;
+}
+
+export async function getClaimStatus(claimId: string) {
+    const claims = await Claim.findOne({id: claimId});
+    if (!claims) {
+        throw("ClaimId not existed");
+    }
+    return claims.status;
+}

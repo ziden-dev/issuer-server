@@ -53,25 +53,27 @@ export async function checkOperatorExisted(userId: string, issuerId: string) {
 }
 
 export async function createNewOperator(userId: string, issuerId: string) {
-    const isOperatorExisted = await checkOperatorExisted(userId, issuerId);
-    if (isOperatorExisted) {
-        throw("Operator existed!");
+    const operatorCheck = await Operator.findOne({userId: userId, issuerId: issuerId});
+    if (operatorCheck) {
+        await saveNewOperator(operatorCheck.userId!, operatorCheck.role!, operatorCheck.claimId!, operatorCheck.issuerId!);
     }
-    const newOperatorClaim = zidenjsClaim.entry.newClaim(
-        zidenjsClaim.entry.schemaHashFromBigInt(BigInt(authenSchemaHash)),
-        zidenjsClaim.entry.withValueData(zidenjsUtils.numToBits(BigInt(OperatorType.OPERATOR), 32), zidenjsUtils.numToBits(BigInt(0), 32)),
-        zidenjsClaim.entry.withIndexID(zidenjsUtils.hexToBuffer(userId, 32))
-    );
-    const claimId = await saveClaim(newOperatorClaim, authenSchemaHash, userId, issuerId, "");
-    const operator = new Operator({
-        userId: userId,
-        role: OperatorType.OPERATOR,
-        claimId: claimId,
-        createAt: Number(Date.now()),
-        issuerId: issuerId,
-        activate: true
-    });
-    await operator.save();
+    else {
+        const newOperatorClaim = zidenjsClaim.entry.newClaim(
+            zidenjsClaim.entry.schemaHashFromBigInt(BigInt(authenSchemaHash)),
+            zidenjsClaim.entry.withValueData(zidenjsUtils.numToBits(BigInt(OperatorType.OPERATOR), 32), zidenjsUtils.numToBits(BigInt(0), 32)),
+            zidenjsClaim.entry.withIndexID(zidenjsUtils.hexToBuffer(userId, 32))
+        );
+        const claimId = await saveClaim(newOperatorClaim, authenSchemaHash, userId, issuerId, "");
+        const operator = new Operator({
+            userId: userId,
+            role: OperatorType.OPERATOR,
+            claimId: claimId,
+            createAt: Number(Date.now()),
+            issuerId: issuerId,
+            activate: true
+        });
+        await operator.save();
+    }
 }
 
 export async function getListOperator(issuerId: string) {

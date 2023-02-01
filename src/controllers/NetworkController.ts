@@ -49,7 +49,7 @@ export class NetworkController {
             const { networkId } = req.params;
             const { chainId, name, shotName } = req.body;
             if (!chainId || !name || !shotName || !networkId || typeof (chainId) != "string" || typeof (name) != "string" || typeof (shotName) != "string" || typeof (networkId) != "string") {
-                throw ("invalid id");
+                throw ("invalid input");
             }
             const network = await updateNetwork(networkId, chainId, name, shotName);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, network, ResultMessage.APISUCCESS.message));

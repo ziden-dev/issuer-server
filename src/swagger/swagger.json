@@ -349,6 +349,142 @@
         }
       }
     },
+    "/api/claims": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Query claims",
+        "description": "Query claims",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "query",
+            "description": "issuerId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED",
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string",
+                "description": "search by PENDING | ACTIVE | REVIEWING | REJECT | PENDING_REVOKE | REVOKED"
+              }
+            }
+          },
+          {
+            "name": "holderId",
+            "in": "query",
+            "description": "holderId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "schemaHash",
+            "in": "query",
+            "description": "schemaHash",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/claims/{claimId}/status": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Get claim status",
+        "description": "Get claim status",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/claims/{claimId}/proof": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Query proof input",
+        "description": "Query proof input",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "id of claim",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type in (mtp, nonRevMtp)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "mtp",
+              "enum": [
+                "mtp",
+                "nonRevMtp"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/claims/publish-challenge/{issuerId}": {
       "get": {
         "security": [
@@ -598,35 +734,139 @@
         }
       }
     },
-    "/api/claims/{claimId}/proof": {
+    "/api/networks": {
+      "post": {
+        "tags": [
+          "networks"
+        ],
+        "summary": "Create new network",
+        "description": "Create new network",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Network"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
-          "claims"
+          "networks"
         ],
-        "summary": "Query claim data for generate proof",
-        "description": "Query claim data for generate proof",
+        "summary": "Get all network",
+        "description": "Get all network",
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/networks/{networkId}": {
+      "get": {
+        "tags": [
+          "networks"
+        ],
+        "summary": "Get network by networkId",
+        "description": "Create new network",
         "parameters": [
           {
-            "name": "claimId",
+            "name": "networkId",
             "in": "path",
-            "description": "id of claim",
+            "description": "networkId",
             "required": true,
             "schema": {
               "type": "string"
             }
-          },
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "networks"
+        ],
+        "summary": "Update network by networkId",
+        "description": "Update network by networkId",
+        "parameters": [
           {
-            "name": "type",
-            "in": "query",
-            "description": "type in (mtp, nonRevMtp)",
+            "name": "networkId",
+            "in": "path",
+            "description": "networkId",
             "required": true,
             "schema": {
-              "type": "string",
-              "default": "mtp",
-              "enum": [
-                "mtp",
-                "nonRevMtp"
-              ]
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Network"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "networks"
+        ],
+        "summary": "Delete network by networkId",
+        "description": "Delete new network",
+        "parameters": [
+          {
+            "name": "networkId",
+            "in": "path",
+            "description": "networkId",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -741,6 +981,23 @@
                 "example": "2655604807051308811171436613928479239441325277756998151249502848413329977634"
               }
             }
+          }
+        }
+      },
+      "Network": {
+        "type": "object",
+        "properties": {
+          "chainId": {
+            "type": "string",
+            "example": "chainId"
+          },
+          "name": {
+            "type": "string",
+            "example": "name"
+          },
+          "shotName": {
+            "type": "string",
+            "name": "shotName"
           }
         }
       }

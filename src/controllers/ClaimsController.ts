@@ -7,13 +7,37 @@ import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.j
 import { serializaData } from "../util/utils.js";
 import { claim as zidenjsClaim } from "zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
-import { getClaimByClaimId, getNonRevQueryMTPInput, getQueryMTPInput } from "../services/Claim.js";
-import { ProofTypeQuery } from "../common/enum/EnumType.js";
+import { getClaimByClaimId, getClaimStatus, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim } from "../services/Claim.js";
+import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
         try {
+            let {issuerId, status, holderId, schemaHash} = req.query;
+            if (!issuerId) {
+                issuerId = "";
+            }
+            if (!status) {
+                status = [];
+            }
+            if (typeof status == "string") {
+                status = [status];
+            }
+            if (!holderId) {
+                holderId = "";
+            }
+            if (!schemaHash) {
+                schemaHash = "";
+            }
 
+            if (typeof issuerId != "string" || typeof holderId != "string" || typeof schemaHash != "string") {
+                throw("Invalid query input");
+            }
+
+            const claims = await queryClaim(issuerId, status as string[], holderId, schemaHash);
+            res.send(
+                buildResponse(ResultMessage.APISUCCESS.apiCode, claims, ResultMessage.APISUCCESS.message)
+            );
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -29,6 +53,9 @@ export class ClaimsController {
             }
 
             const claim = await getClaimByClaimId(id);
+            if (claim.status != ClaimStatus.ACTIVE) {
+                throw("Claim is not ACTIVE");
+            }
 
             let queryResponse = {};
 
@@ -51,7 +78,14 @@ export class ClaimsController {
 
     public async getClaimStatus(req: Request, res: Response) {
         try {
-
+            const {claimId} = req.params;
+            if (!claimId || typeof claimId != "string") {
+                throw("Invalid claimId");
+            }
+            const claimStatus = await getClaimStatus(claimId);
+            res.send(
+                buildResponse(ResultMessage.APISUCCESS.apiCode, {status: claimStatus}, ResultMessage.APISUCCESS.message)
+            );
         } catch (err: any) {
             console.log(err);
             res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
