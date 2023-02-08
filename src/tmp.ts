@@ -8,17 +8,17 @@ import { getCountryCode, serializaData } from "./util/utils.js";
 
 async function test() {
     await GlobalVariables.init();
-    // const pass = "issuerv2test"
+    // const pass = "issuer-v2-dev"
     // const x = zidenjsUtils.privateKeyFromPassword(pass);
     // console.log(zidenjsUtils.bufferToHex(x));
 
 
 
-    // const pi = "9988771111";
-    // const pihex = zidenjsUtils.hexToBuffer(pi, 32);
-    // console.log(GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(pihex)[0]));
+    const pi = "1122334455";
+    const pihex = zidenjsUtils.hexToBuffer(pi, 32);
+    console.log(GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(pihex)[0]));
 
-    // console.log(GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(pihex)[1]));
+    console.log(GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(pihex)[1]));
 
     // const pri = "9988771111";
     // const challenge = "4677482851936488611498746715952887527835261778658872395323764468771116433629";

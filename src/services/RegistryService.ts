@@ -75,6 +75,7 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
     const response: Array<any> = [];
     registries.forEach(registry => {
         response.push({
+            id: registry.id,
             schemaHash: registry.schemaHash,
             issuerId: registry.issuerId,
             description: registry.description,
