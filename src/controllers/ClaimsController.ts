@@ -7,7 +7,7 @@ import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.j
 import { serializaData } from "../util/utils.js";
 import { claim as zidenjsClaim } from "zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
-import { getClaimByClaimId, getClaimStatus, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, setRevokeClaim } from "../services/Claim.js";
+import { createClaim, encodeClaim, getClaimByClaimId, getClaimStatus, getEntryData, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, saveClaim, saveEntryData, setRevokeClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
 import Schema from "../models/Schema.js";
 import { createNewSchema } from "../services/Schema.js";
@@ -96,6 +96,13 @@ export class ClaimsController {
 
     public async retrieveClaim(req: Request, res: Response) {
         try {
+            const {claimId} = req.params;
+            if (!claimId || typeof claimId != "string") {
+                throw("Invalid claimId");
+            }
+
+            const data = await getEntryData(claimId);
+            res.status(200).send(data);
 
         } catch (err: any) {
             console.log(err);
@@ -105,7 +112,21 @@ export class ClaimsController {
 
     public async requestNewClaim(req: Request, res: Response) {
         try {
-
+            const {holderId, registryId, publicKey, data} = req.body;
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+            if (!holderId || !registryId || !publicKey || !data
+                || typeof holderId != "string" || typeof registryId != "string" || typeof publicKey != "string") {
+                    throw("Invalid data");
+                }
+            
+            const {claim, schemaHash} = await createClaim(data, holderId, registryId);
+            const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
+            const { cipher, nonce, serverPublicKey } = await encodeClaim(claim, data, publicKey);
+            
+            res.send({ claimId: claimId, encodeClaim: cipher, nonce: nonce, serverPublicKey: serverPublicKey });
         } catch (err: any) {
             console.log(err);
             res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -114,7 +135,43 @@ export class ClaimsController {
 
     public async issueListClaims(req: Request, res: Response) {
         try {
+            let claimResponse: Array<any> = [];
+            const {issuerId} = req.params;
+            if (!issuerId || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
 
+            for (let i = 0; i < req.body.length; i++) {
+                try {
+                    const { holderId, registryId, data } = req.body[i];
+                    if (!holderId || !registryId || !data
+                        || typeof holderId != "string" || typeof registryId != "string") {
+                            throw("Invalid data");
+                    }
+        
+                    const {claim, schemaHash} = await createClaim(data, holderId, registryId);
+                    const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
+            
+                    await saveEntryData(claimId, claim, data);
+
+                    claimResponse.push(
+                        {
+                            index: i,
+                            claimId: claimId
+                        }
+                    );
+        
+                } catch (err: any) {
+                    const error = (buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+                    claimResponse.push(
+                        {
+                            index: i,
+                            err: error
+                        }
+                    );
+                }
+            }
+            res.status(200).send(claimResponse);
         } catch (err: any) {
             console.log(err);
             res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));

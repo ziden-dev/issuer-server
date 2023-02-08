@@ -1,11 +1,34 @@
 import { v4 } from "uuid";
-import { claim as zidenjsClaim, witness as zidenjsWitness } from "zidenjs";
+import { claim as zidenjsClaim, witness as zidenjsWitness, schema as zidenjsSchema } from "zidenjs";
 import { GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus, ProofType } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
-import { serializaData } from "../util/utils.js";
+import SchemaRegistry from "../models/SchemaRegistry.js";
+import { serializaData, serializaDataClaim } from "../util/utils.js";
 import { closeLevelDb } from "./LevelDbManager.js";
+import { getRawSchema } from "./Schema.js";
 import { getTreeState, saveTreeState } from "./TreeState.js";
+import libsodium from "libsodium-wrappers";
+import Entry from "../models/Entry.js";
+
+export async function createClaim(data: any, holderId: string, registryId: string) {
+    const registry = await SchemaRegistry.findOne({id: registryId});
+    if (!registry) {
+        throw("RegistryId not exist!");
+    }
+
+    const schemaHash = registry.schemaHash;
+    if (typeof schemaHash != "string") {
+        throw("SchemaHash not exist!");
+    }
+    const schema = await getRawSchema(schemaHash);
+    if (!schema) {
+        throw("SchemaHash not exist!");
+    }
+
+    const claim = zidenjsSchema.buildEntryFromSchema(data, holderId, schema, registry);
+    return {claim: claim, schemaHash: schemaHash};
+}
 
 export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: string, userId: string, issuerId: string, schemaRegistryId: string) {
     const claimId = v4();
@@ -156,4 +179,68 @@ export async function setRevokeClaim(revNonces: Array<number>) {
         });
     }
     return idClaims;
+}
+
+export async function encodeClaim(claim: zidenjsClaim.entry.Entry, rawData: any, clientPubkey: string) {
+    let data = serializaData({
+        rawData: rawData,
+        claim: serializaDataClaim(claim)
+    });
+    
+    await libsodium.ready;
+
+    while(clientPubkey.length < 64) {
+        clientPubkey = "0" + clientPubkey;
+    }
+        
+    let serverKeyPair = libsodium.crypto_box_keypair("hex");
+
+    while(serverKeyPair.privateKey.length < 64) {
+        serverKeyPair.privateKey = "0" + serverKeyPair.privateKey;
+    }
+
+    while(serverKeyPair.publicKey.length < 64) {
+        serverKeyPair.publicKey = "0" + serverKeyPair.publicKey;
+    }
+
+    const nonce = libsodium.randombytes_buf(libsodium.crypto_box_NONCEBYTES, "hex");
+    const cipher = libsodium.crypto_box_easy(data, libsodium.from_hex(nonce), libsodium.from_hex(clientPubkey), libsodium.from_hex(serverKeyPair.privateKey), "hex");
+    return {
+        cipher: cipher,
+        nonce: nonce,
+        serverPublicKey: serverKeyPair.publicKey
+    }
+}
+
+export async function saveEntryData(claimdId: string, claim: zidenjsClaim.entry.Entry, rawData: Object) {
+    const newRaw = new Entry({
+        claimId: claimdId,
+        rawData: serializaData(rawData).toString(),
+        entry: serializaDataClaim(claim)
+    });
+
+    await newRaw.save();
+}
+
+export async function getEntryData(claimId: string) {
+    try {
+        const rawData = await Entry.findOne({claimId: claimId});
+        if (!rawData) {
+            throw("Not have entry data for claimId: " + claimId);
+        }
+
+        let claim = rawData.entry;
+        let data = {};
+        if (rawData.rawData) {
+            data = JSON.parse(rawData.rawData);
+        }
+
+        return {
+            entry: claim,
+            data: data
+        };
+
+    } catch (err: any) {
+        throw (err);
+    }
 }

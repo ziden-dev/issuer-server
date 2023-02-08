@@ -1,4 +1,6 @@
 import { PUBKEYX, PUBKEYY } from "../common/config/secrets.js";
+import { ClaimStatus } from "../common/enum/EnumType.js";
+import Claim from "../models/Claim.js";
 import Issuer from "../models/Issuer.js";
 
 export async function saveIssuer(issuerId: string, pubkeyX: string, pubkeyY: string, pathDb: string) {
@@ -68,4 +70,15 @@ export async function checkIssuerExisted(pubkeyX: string, pubkeyY: string) {
 export async function getAuthenIssuerId() {
     const issuer = await Issuer.findOne({pubkeyX: PUBKEYX, pubkeyY: PUBKEYY});
     return issuer?.issuerId;
+}
+
+export async function getIssuerInfor(issuerId: string) {
+    const numPublishClaims = await Claim.countDocuments({"issuerId": issuerId, status: ClaimStatus.ACTIVE});
+    const numHolders = (await Claim.aggregate([{"$match": {"issuerId": issuerId}}, {"$group": {_id: "$userId"}}])).length;
+        
+    return {
+        issuerId: issuerId,
+        numPublishClaims: numPublishClaims,
+        numHolders: numHolders
+    }
 }

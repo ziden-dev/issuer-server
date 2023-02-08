@@ -330,3 +330,31 @@ async function getSubContext(schema: any) {
 
     return listContext;
 }
+
+export async function getRawSchema(schemaHash: string) {
+    const schema = await Schema.findOne({"@hash": schemaHash});
+    if (!schema) {
+        throw("SchemaHash not exist!");
+    }
+    if (schema["@type"] == SchemaType.context) {
+        throw("Invalid schemaHash!");
+    }
+
+    const schemaRaw: any = schema;
+
+    const schema2: any = {};
+
+    const listContext = await getSubContext(schema);
+
+    const keys = Object.keys(schemaRaw);
+    keys.forEach(key => {
+        if (key[0] ==  '_' || key[0] == '$' || key == "@context") {
+            return;
+        } 
+        schema2[key] = schemaRaw[key];
+    })
+
+    schema2["@context"] = listContext;
+    
+    return schema2;
+}

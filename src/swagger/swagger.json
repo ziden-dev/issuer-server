@@ -429,6 +429,53 @@
         }
       }
     },
+    "/api/issuers/{issuerId}/profile": {
+      "get": {
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get Issuer infor",
+        "description": "Get Issuer infor",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/claims": {
       "get": {
         "tags": [
@@ -498,6 +545,153 @@
         }
       }
     },
+    "/api/claims/{claimId}/retrieve": {
+      "get": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Retrive claims data from claimId",
+        "description": "Retrive claims data from claimId",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/claims/request/{issuerId}": {
+      "post": {
+        "tags": [
+          "claims"
+        ],
+        "summary": "Request create claim",
+        "description": "Request create claim",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestClaim"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/claims/issue/{issuerId}": {
+      "post": {
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Issue list claim",
+        "description": "Issue list claim",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueListClaims"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/api/claims/{claimId}/status": {
       "get": {
         "tags": [
@@ -1700,6 +1894,40 @@
             "type": "string",
             "example": "endpointUrl"
           }
+        }
+      },
+      "RequestClaim": {
+        "type": "object",
+        "properties": {
+          "holderId": {
+            "type": "string"
+          },
+          "registryId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "IssueListClaims": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+          "holderId": {
+            "type": "string"
+          },
+          "registryId": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
         }
       }
     },
