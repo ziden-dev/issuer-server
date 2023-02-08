@@ -36,12 +36,12 @@ class Server {
   }
 
   public routes(): void {
-    this.app.use("/api/auth", new AthenRoutes().router);
-    this.app.use("/api/issuers", new IssuerRooutes().router);
-    this.app.use("/api/claims", new ClaimsRouters().router);
-    this.app.use("/api/schemas", new SchemasRouter().router);
-    this.app.use("/api/registries", new RegistriesRoutes().router);
-    this.app.use("/api/networks", new NetWorkRoutes().router);
+    this.app.use("/api/v1/auth", new AthenRoutes().router);
+    this.app.use("/api/v1/issuers", new IssuerRooutes().router);
+    this.app.use("/api/v1/claims", new ClaimsRouters().router);
+    this.app.use("/api/v1/schemas", new SchemasRouter().router);
+    this.app.use("/api/v1/registries", new RegistriesRoutes().router);
+    this.app.use("/api/v1/networks", new NetWorkRoutes().router);
   }
 
   public config(): void {

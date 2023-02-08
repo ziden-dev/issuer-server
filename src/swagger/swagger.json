@@ -31,7 +31,7 @@
     }
   ],
   "paths": {
-    "/api/auth/login/{issuerId}": {
+    "/api/v1/auth/login/{issuerId}": {
       "post": {
         "tags": [
           "auth"
@@ -83,7 +83,7 @@
         }
       }
     },
-    "/api/authen/verify-token/{issuerId}": {
+    "/api/v1/authen/verify-token/{issuerId}": {
       "post": {
         "tags": [
           "auth"
@@ -136,7 +136,7 @@
         }
       }
     },
-    "/api/issuers/register": {
+    "/api/v1/issuers/register": {
       "post": {
         "tags": [
           "issuers"
@@ -176,7 +176,7 @@
         }
       }
     },
-    "/api/issuers/{issuerId}/restore-last-state": {
+    "/api/v1/issuers/{issuerId}/restore-last-state": {
       "put": {
         "security": [
           {
@@ -223,7 +223,7 @@
         }
       }
     },
-    "/api/issuers/{issuerId}/operators": {
+    "/api/v1/issuers/{issuerId}/operators": {
       "post": {
         "security": [
           {
@@ -324,7 +324,7 @@
         }
       }
     },
-    "/api/issuers/{issuerId}/operators/{operatorId}": {
+    "/api/v1/issuers/{issuerId}/operators/{operatorId}": {
       "get": {
         "tags": [
           "issuers"
@@ -429,7 +429,7 @@
         }
       }
     },
-    "/api/issuers/{issuerId}/profile": {
+    "/api/v1/issuers/{issuerId}/profile": {
       "get": {
         "security": [
           {
@@ -476,7 +476,7 @@
         }
       }
     },
-    "/api/claims": {
+    "/api/v1/claims": {
       "get": {
         "tags": [
           "claims"
@@ -545,7 +545,7 @@
         }
       }
     },
-    "/api/claims/{claimId}/retrieve": {
+    "/api/v1/claims/{claimId}/retrieve": {
       "get": {
         "tags": [
           "claims"
@@ -586,7 +586,7 @@
         }
       }
     },
-    "/api/claims/request/{issuerId}": {
+    "/api/v1/claims/request/{issuerId}": {
       "post": {
         "tags": [
           "claims"
@@ -636,7 +636,7 @@
         }
       }
     },
-    "/api/claims/issue/{issuerId}": {
+    "/api/v1/claims/issue/{issuerId}": {
       "post": {
         "security": [
           {
@@ -692,7 +692,7 @@
       }
     },
 
-    "/api/claims/{claimId}/status": {
+    "/api/v1/claims/{claimId}/status": {
       "get": {
         "tags": [
           "claims"
@@ -733,7 +733,7 @@
         }
       }
     },
-    "/api/claims/{claimId}/proof": {
+    "/api/v1/claims/{claimId}/proof": {
       "get": {
         "tags": [
           "claims"
@@ -789,7 +789,7 @@
         }
       }
     },
-    "/api/claims/revoke-list/{issuerId}": {
+    "/api/v1/claims/revoke-list/{issuerId}": {
       "post": {
         "security": [
           {
@@ -845,7 +845,7 @@
         }
       }
     },
-    "/api/claims/publish-challenge/{issuerId}": {
+    "/api/v1/claims/publish-challenge/{issuerId}": {
       "get": {
         "security": [
           {
@@ -892,7 +892,7 @@
         }
       }
     },
-    "/api/claims/revoke-challenge/{issuerId}": {
+    "/api/v1/claims/revoke-challenge/{issuerId}": {
       "get": {
         "security": [
           {
@@ -939,7 +939,7 @@
         }
       }
     },
-    "/api/claims/combined-challenge/{issuerId}": {
+    "/api/v1/claims/combined-challenge/{issuerId}": {
       "get": {
         "security": [
           {
@@ -986,7 +986,7 @@
         }
       }
     },
-    "/api/claims/publish/{issuerId}": {
+    "/api/v1/claims/publish/{issuerId}": {
       "post": {
         "security": [
           {
@@ -1042,7 +1042,7 @@
         }
       }
     },
-    "/api/claims/revoke/{issuerId}": {
+    "/api/v1/claims/revoke/{issuerId}": {
       "post": {
         "security": [
           {
@@ -1098,7 +1098,7 @@
         }
       }
     },
-    "/api/claims/combined/{issuerId}": {
+    "/api/v1/claims/combined/{issuerId}": {
       "post": {
         "security": [
           {
@@ -1154,7 +1154,7 @@
         }
       }
     },
-    "/api/networks": {
+    "/api/v1/networks": {
       "post": {
         "tags": [
           "networks"
@@ -1223,7 +1223,7 @@
         }
       }
     },
-    "/api/networks/{networkId}": {
+    "/api/v1/networks/{networkId}": {
       "get": {
         "tags": [
           "networks"
@@ -1354,7 +1354,7 @@
         }
       }
     },
-    "/api/schemas": {
+    "/api/v1/schemas": {
       "post": {
         "tags": [
           "schemas"
@@ -1424,7 +1424,7 @@
         }
       }
     },
-    "/api/schemas/{schemaHash}": {
+    "/api/v1/schemas/{schemaHash}": {
       "get": {
         "tags": [
           "schemas"
@@ -1466,7 +1466,7 @@
         }
       }
     },
-    "/api/schemas/primative/{schemaHash}": {
+    "/api/v1/schemas/primative/{schemaHash}": {
       "get": {
         "tags": [
           "schemas"
@@ -1508,7 +1508,7 @@
         }
       }
     },
-    "/api/registries": {
+    "/api/v1/registries": {
       "post": {
         "tags": [
           "registries"
@@ -1604,7 +1604,7 @@
         }
       }
     },
-    "/api/registries/{registryId}": {
+    "/api/v1/registries/{registryId}": {
       "put": {
         "tags": [
           "registries"
@@ -1656,7 +1656,7 @@
         }
       }
     },
-    "/api/registries/{registryId}/activate": {
+    "/api/v1/registries/{registryId}/activate": {
       "put": {
         "tags": [
           "registries"
