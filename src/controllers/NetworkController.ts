@@ -16,7 +16,7 @@ export class NetworkController {
 
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -26,7 +26,7 @@ export class NetworkController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, allNetworks, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -40,7 +40,7 @@ export class NetworkController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, network, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -55,7 +55,7 @@ export class NetworkController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, network, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -69,7 +69,7 @@ export class NetworkController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 }

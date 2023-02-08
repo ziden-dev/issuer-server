@@ -1,3 +1,4 @@
+import { PUBKEYX, PUBKEYY } from "../common/config/secrets.js";
 import Issuer from "../models/Issuer.js";
 
 export async function saveIssuer(issuerId: string, pubkeyX: string, pubkeyY: string, pathDb: string) {
@@ -62,4 +63,9 @@ export async function checkIssuerExisted(pubkeyX: string, pubkeyY: string) {
     } else {
         return true;
     }
+}
+
+export async function getAuthenIssuerId() {
+    const issuer = await Issuer.findOne({pubkeyX: PUBKEYX, pubkeyY: PUBKEYY});
+    return issuer?.issuerId;
 }

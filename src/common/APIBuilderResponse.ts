@@ -1,16 +1,14 @@
-import { APIResponse } from './APIResponse.js';
-
-export function buildResponse(apiCode: number, data: Object, message: string): APIResponse {
-    return new APIResponse(apiCode, (data), message);
+export function buildResponse(apiCode: number, data: Object, message: string) {
+    return data;
 }
 
-export function buildExceptionMessage(apiCode: number, message: string): APIResponse {
-    return new APIResponse(apiCode, {}, message);
+export function buildExceptionMessage(apiCode: number, message: string) {
+    return { error: "", message: message };
 }
 
-export function buildErrorMessage(apiCode: number, err: Error | string, message: string): APIResponse {
+export function buildErrorMessage(apiCode: number, err: Error | string, message: string) {
     if (typeof err == 'string')
-        return new APIResponse(apiCode, { error: err }, message);
+        return { error: err, message: message };
 
-    return new APIResponse(apiCode, { error: err.message }, message);
+    return { error: err.message, message: message };
 }

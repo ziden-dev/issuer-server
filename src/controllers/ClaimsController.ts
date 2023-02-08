@@ -7,8 +7,10 @@ import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.j
 import { serializaData } from "../util/utils.js";
 import { claim as zidenjsClaim } from "zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
-import { getClaimByClaimId, getClaimStatus, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim } from "../services/Claim.js";
+import { getClaimByClaimId, getClaimStatus, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, setRevokeClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
+import Schema from "../models/Schema.js";
+import { createNewSchema } from "../services/Schema.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
@@ -40,7 +42,7 @@ export class ClaimsController {
             );
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -67,12 +69,12 @@ export class ClaimsController {
                 queryResponse = await getNonRevQueryMTPInput(claim.issuerId, claim.revNonce);
             }
 
-            res.send(
+            res.status(200).send(
                 buildResponse(ResultMessage.APISUCCESS.apiCode, queryResponse, ResultMessage.APISUCCESS.message)
             );
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -88,7 +90,7 @@ export class ClaimsController {
             );
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -97,7 +99,7 @@ export class ClaimsController {
 
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -106,7 +108,7 @@ export class ClaimsController {
 
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -115,16 +117,26 @@ export class ClaimsController {
 
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
     public async revokeListClaims(req: Request, res: Response) {
         try {
-
+            const {revNonces} = req.body;
+            if (revNonces == undefined || revNonces.length == 0) {
+                throw ("Required array revNonces to revoke");
+            }
+            revNonces.forEach((revNonce: any) => {
+                if (typeof revNonce != "number") {
+                    throw("revNonces must be array number");
+                }
+            });
+            const claims = await setRevokeClaim(revNonces);
+            res.status(101).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -152,7 +164,7 @@ export class ClaimsController {
             }
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -180,7 +192,7 @@ export class ClaimsController {
             }
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -208,7 +220,7 @@ export class ClaimsController {
             }
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -248,7 +260,7 @@ export class ClaimsController {
             }        
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -289,7 +301,7 @@ export class ClaimsController {
         
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -330,7 +342,7 @@ export class ClaimsController {
         
         } catch (err: any) {
             console.log(err);
-            res.send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 }

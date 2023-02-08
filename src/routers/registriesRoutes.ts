@@ -15,6 +15,6 @@ export class RegistriesRoutes {
         this.router.post("", this.registriesController.registerNewSchemaRegistry);
         this.router.get("", this.registriesController.findSchemaRegistry);
         this.router.put("/:registryId", this.registriesController.updateRegistrySchema);
-        this.router.post(".:registryId/activate", this.registriesController.changeStatusSchemaRegistry);
+        this.router.put("/:registryId/activate", this.registriesController.changeStatusSchemaRegistry);
     }
 }

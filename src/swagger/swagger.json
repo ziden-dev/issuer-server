@@ -485,6 +485,52 @@
         }
       }
     },
+    "/api/claims/revoke-list/{issuerId}": {
+      "post": {
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "claims"
+        ],
+        "summary": "Revoke list claims",
+        "description": "Revoke list claims",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/claims/publish-challenge/{issuerId}": {
       "get": {
         "security": [
@@ -883,6 +929,286 @@
           }
         }
       }
+    },
+    "/api/schemas": {
+      "post": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "API create Schemas",
+        "description": "API create Schemas",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Schema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "API get all schema",
+        "description": "API get all schema",
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/schemas/{schemaHash}": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "parameters": [
+          {
+            "name": "schemaHash",
+            "in": "path",
+            "description": "schemaHash",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "summary": "API get schema by schemaHash",
+        "description": "API get schema by schemaHash",
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/schemas/primative/{schemaHash}": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "parameters": [
+          {
+            "name": "schemaHash",
+            "in": "path",
+            "description": "schemaHash",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "summary": "API get primative schema by schemaHash",
+        "description": "API get primative schema by schemaHash",
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registries": {
+      "post": {
+        "tags": [
+          "registries"
+        ],
+        "summary": "API create new registry",
+        "description": "API create new registry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "registries"
+        ],
+        "summary": "API find registries",
+        "description": "API find registries",
+        "parameters": [
+          {
+            "name": "schemaHash",
+            "in": "query",
+            "description": "schemaHash",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issuerId",
+            "in": "query",
+            "description": "issuerId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "description": "network",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registries/{registryId}": {
+      "put": {
+        "tags": [
+          "registries"
+        ],
+        "summary": "API update registry by registryId",
+        "description": "API update registry by registryId",
+        "parameters": [
+          {
+            "name": "registryId",
+            "in": "path",
+            "description": "registryId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registries/{registryId}/activate": {
+      "put": {
+        "tags": [
+          "registries"
+        ],
+        "summary": "API active/deactive registry",
+        "description": "API active/deactive registry",
+        "parameters": [
+          {
+            "name": "registryId",
+            "in": "path",
+            "description": "registryId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isActive": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "API response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -998,6 +1324,70 @@
           "shotName": {
             "type": "string",
             "name": "shotName"
+          }
+        }
+      },
+      "Schema": {
+        "type": "object",
+        "properties": {
+          "@name": {
+            "type": "string"
+          },
+          "@type": {
+            "type": "string"
+          },
+          "@context": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RevokeList": {
+        "type": "object",
+        "properties": {
+          "revNonces": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": [10, 11, 12]
+          }
+        }
+      },
+      "Registry": {
+        "type": "object",
+        "properties": {
+          "schemaHash": {
+            "type": "string",
+            "example": "schemaHash"
+          },
+          "issuerId": {
+            "type": "string",
+            "example": "issuerId"
+          },
+          "description": {
+            "type": "string",
+            "example": "description"
+          },
+          "expiration": {
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          },
+          "updatetable": {
+            "type": "boolean",
+            "example": false
+          },
+          "network": {
+            "type": "string",
+            "example": "network"
+          },
+          "endpointUrl": {
+            "type": "string",
+            "example": "endpointUrl"
           }
         }
       }
