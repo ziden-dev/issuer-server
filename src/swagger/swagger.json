@@ -61,11 +61,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -104,11 +114,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -134,11 +154,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -171,11 +201,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -217,11 +257,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -252,11 +302,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -293,11 +353,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -337,11 +407,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -396,11 +476,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -427,11 +517,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -473,11 +573,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -519,11 +629,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -556,11 +676,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -593,11 +723,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -630,11 +770,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -676,11 +826,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -722,11 +882,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -768,11 +938,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -798,11 +978,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -817,11 +1007,21 @@
         "description": "Get all network",
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -849,11 +1049,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -888,11 +1098,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -918,11 +1138,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -949,11 +1179,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -968,11 +1208,21 @@
         "description": "API get all schema",
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1000,11 +1250,21 @@
         "description": "API get schema by schemaHash",
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1032,11 +1292,21 @@
         "description": "API get primative schema by schemaHash",
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1063,11 +1333,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1108,11 +1388,21 @@
         ],
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1150,11 +1440,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1198,11 +1498,21 @@
         },
         "responses": {
           "default": {
-            "description": "API response",
+            "description": "Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1216,15 +1526,16 @@
       "APIResponse": {
         "type": "object",
         "properties": {
-          "apiCode": {
-            "type": "integer",
-            "format": "int64"
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
           },
           "message": {
             "type": "string"
-          },
-          "data": {
-            "type": "object"
           }
         }
       },
