@@ -18,7 +18,7 @@ export class IssuerController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registerResponse, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -34,7 +34,7 @@ export class IssuerController {
 
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -54,7 +54,7 @@ export class IssuerController {
             res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -73,7 +73,7 @@ export class IssuerController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -93,7 +93,7 @@ export class IssuerController {
         
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -109,7 +109,7 @@ export class IssuerController {
 
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -124,7 +124,7 @@ export class IssuerController {
             res.status(200).send(ans);
             
         } catch(err: any) {
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 }

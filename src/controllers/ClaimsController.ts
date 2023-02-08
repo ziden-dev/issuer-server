@@ -42,7 +42,7 @@ export class ClaimsController {
             );
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -74,7 +74,7 @@ export class ClaimsController {
             );
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -90,7 +90,7 @@ export class ClaimsController {
             );
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -106,7 +106,7 @@ export class ClaimsController {
 
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -129,7 +129,7 @@ export class ClaimsController {
             res.send({ claimId: claimId, encodeClaim: cipher, nonce: nonce, serverPublicKey: serverPublicKey });
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -174,7 +174,7 @@ export class ClaimsController {
             res.status(200).send(claimResponse);
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -190,10 +190,10 @@ export class ClaimsController {
                 }
             });
             const claims = await setRevokeClaim(revNonces);
-            res.status(101).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
+            res.status(400).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -221,7 +221,7 @@ export class ClaimsController {
             }
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -249,7 +249,7 @@ export class ClaimsController {
             }
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -277,7 +277,7 @@ export class ClaimsController {
             }
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -317,7 +317,7 @@ export class ClaimsController {
             }        
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -358,7 +358,7 @@ export class ClaimsController {
         
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -399,7 +399,7 @@ export class ClaimsController {
         
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 }

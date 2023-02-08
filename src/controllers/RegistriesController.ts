@@ -12,7 +12,7 @@ export class RegistriesController {
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registry, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -46,7 +46,7 @@ export class RegistriesController {
 
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -68,7 +68,7 @@ export class RegistriesController {
         
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
 
@@ -89,7 +89,7 @@ export class RegistriesController {
 
         } catch (err: any) {
             console.log(err);
-            res.status(101).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
                 

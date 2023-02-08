@@ -1,7 +1,7 @@
 export const ExceptionMessage = Object.freeze({
     UNKNOWN: {
         message: 'api error unknown',
-        apiCode: 101
+        apiCode: 400
     },
     USER_NOT_EXITS: {
         message: 'user not exits',

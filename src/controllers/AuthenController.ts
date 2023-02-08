@@ -19,12 +19,12 @@ export class AuthenController {
     try {
       const {issuerId} = req.params;
       if (!issuerId) {
-        res.status(101).send({err: "IssuerId invalid"});
+        res.status(400).send({err: "IssuerId invalid"});
         return;
       }
       let { proof, public_signals, circuitId, schema, algorithm, payload } = req.body;
       if (!circuitId || !proof || !public_signals || !schema || !algorithm || !payload) {
-        res.status(101).send({err: "Invalid request"})
+        res.status(400).send({err: "Invalid request"})
         return;
       }
       else {
@@ -40,11 +40,11 @@ export class AuthenController {
             res.status(200).send({ token: compressedToken });
             return;
           } else {
-            res.status(401).send({err: "Invalid proof"});
+            res.status(400).send({err: "Invalid proof"});
             return;
           }
         } catch (err) {
-          res.status(401).send(buildErrorMessage(400, "Invalid proof", "Unable to login"));
+          res.status(400).send(buildErrorMessage(400, "Invalid proof", "Unable to login"));
           return;
         }
 
@@ -67,7 +67,7 @@ export class AuthenController {
         return;
       }
       if (!token) {
-        res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+        res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
       } else {
         try {
           let parsedToken = JWZ.parse(token);
@@ -93,16 +93,16 @@ export class AuthenController {
             return;
           }
           else {
-            res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+            res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
             return;
           }
         } catch (err) {
-          res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+          res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
           return;
         }
       }
     } catch (err: any) {
-      res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+      res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
       return;
     }
   }
@@ -120,7 +120,7 @@ export class AuthenController {
         return;
       }
       if (!token) {
-        res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+        res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
         return;
       } else {
         try {
@@ -133,16 +133,16 @@ export class AuthenController {
             return;
           }
           else {
-            res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+            res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
             return;
           }
         } catch (err) {
-          res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+          res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
           return;
         }
       }
     } catch (err: any) {
-      res.status(401).send(buildErrorMessage(401, "Invalid token", "Unauthorized"));
+      res.status(400).send(buildErrorMessage(400, "Invalid token", "Unauthorized"));
       return;
     }
   }
