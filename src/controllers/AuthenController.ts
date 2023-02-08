@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
+import { getAuthenIssuerId } from "../services/Issuer.js";
 
 let vk = JSON.parse(fs.readFileSync(path.resolve("./build/authen/verification_key.json"), 'utf-8'));
 enum Role {
@@ -18,12 +19,12 @@ export class AuthenController {
     try {
       const {issuerId} = req.params;
       if (!issuerId) {
-        res.send(buildErrorMessage(200, "IssuerId invalid", "Unable to login"));
+        res.status(101).send({err: "IssuerId invalid"});
         return;
       }
       let { proof, public_signals, circuitId, schema, algorithm, payload } = req.body;
       if (!circuitId || !proof || !public_signals || !schema || !algorithm || !payload) {
-        res.send(buildErrorMessage(400, "Invalid request", "Unable to login"))
+        res.status(101).send({err: "Invalid request"})
         return;
       }
       else {
@@ -36,10 +37,10 @@ export class AuthenController {
           let isValid = await token.verifyProof(vk);
           if (isValid) {
             let compressedToken = token.compress();
-            res.send(buildResponse(200, { token: compressedToken }, "Login successful"));
+            res.status(200).send({ token: compressedToken });
             return;
           } else {
-            res.status(401).send(buildErrorMessage(400, "Invalid proof", "Unable to login"));
+            res.status(401).send({err: "Invalid proof"});
             return;
           }
         } catch (err) {
@@ -73,7 +74,8 @@ export class AuthenController {
           const issuer = BigInt("0x" + issuerId).toString();
           let isValid = false;
           try {
-            if ((await parsedToken.verifyToken(vk, Role.Admin, schemaHash, issuer, timeLimit))) {
+            const authenIsser = await getAuthenIssuerId();
+            if ((await parsedToken.verifyToken(vk, Role.Admin, schemaHash, authenIsser!, timeLimit))) {
               isValid = true;
             }
           } catch (err) {
@@ -123,7 +125,7 @@ export class AuthenController {
       } else {
         try {
           let parsedToken = JWZ.parse(token);
-          const issuerIdBigInt = BigInt("0x" + (issuerId)).toString();
+          const issuerIdBigInt = BigInt("0x" + (await getAuthenIssuerId())).toString();
           let isValid = await parsedToken.verifyToken(vk, Role.Admin, schemaHash, issuerIdBigInt, timeLimit)
 
           if (isValid) {

@@ -143,3 +143,17 @@ export async function getClaimStatus(claimId: string) {
     }
     return claims.status;
 }
+
+export async function setRevokeClaim(revNonces: Array<number>) {
+    const claims = await Claim.find({revNonce: {$in: revNonces}, status: ClaimStatus.ACTIVE});
+    const idClaims: Array<any> = [];
+    for (let i = 0; i < claims.length; i++) {
+        claims[i].status = ClaimStatus.PENDING_REVOKE;
+        await claims[i].save();
+        idClaims.push({
+            claimId: claims[i].id,
+            revNonce: claims[i].revNonce
+        });
+    }
+    return idClaims;
+}
