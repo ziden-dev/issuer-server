@@ -19,5 +19,6 @@ export class IssuerRooutes {
         this.router.get("/:issuerId/operators/:operatorId", this.issuerController.getOperatorInfor);
         this.router.get("/:issuerId/operators", this.authenController.authorizationAdmin, this.issuerController.getListOperator);
         this.router.get("/:issuerId/profile", this.issuerController.getIssuerInfor);
+        this.router.get("", this.issuerController.getAllIssuerId);
     }
 }

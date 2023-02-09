@@ -136,6 +136,37 @@
         }
       }
     },
+    "/api/v1/issuers": {
+      "get": {
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get all issuers infor",
+        "description": "Get all issuers infor",
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/issuers/register": {
       "post": {
         "tags": [

@@ -82,3 +82,13 @@ export async function getIssuerInfor(issuerId: string) {
         numHolders: numHolders
     }
 }
+
+export async function getAllIssuer() {
+    const issuers = await Issuer.find({pubkeyX: {"$ne": PUBKEYX}, pubkeyY: {"$ne": PUBKEYY}});
+    let listIssuer: Array<any> = [];
+    for (let i = 0; i < issuers.length; i++) {
+        const ans = await getIssuerInfor(issuers[i].issuerId!);
+        listIssuer.push(ans);
+    }
+    return listIssuer;
+}

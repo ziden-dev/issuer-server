@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
-import { getIssuerInfor } from "../services/Issuer.js";
+import { getAllIssuer, getIssuerInfor } from "../services/Issuer.js";
 import { createNewOperator, disableOperator, getListOperator, getOperatorInfor } from "../services/Operator.js";
 import { registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
 
@@ -124,6 +124,16 @@ export class IssuerController {
             res.status(200).send(ans);
             
         } catch(err: any) {
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+        }
+    }
+
+    public async getAllIssuerId(req: Request, res: Response) {
+        try {
+            const ans = await getAllIssuer();
+            res.status(200).send(ans);
+            return;
+        } catch (err: any) {
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
