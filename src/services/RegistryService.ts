@@ -50,7 +50,8 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
         expiration: expiration,
         updatable: updateble,
         endpointUrl: endpointUrl,
-        isActive: true
+        isActive: true,
+        network: network,
     });
 
     await newRegistry.save();
