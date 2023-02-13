@@ -7,68 +7,80 @@ import { cloneDb, closeLevelDb, restoreDb } from "./LevelDbManager.js";
 import { getTreeState } from "./TreeState.js";
 
 export async function getPublishChallenge(claimIds: Array<string>, issuerId: string): Promise<BigInt> {
-    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
-    let issuer = await getIssuer(issuerId);
 
     const claims = await Claim.find({"id": {$in: claimIds}, "status": ClaimStatus.PENDING, "issuerId": issuerId});
     if (claims.length == 0) {
         return BigInt(0);
     }
 
-    await cloneDb(issuer.pathDb!);
-    const hihv: [ArrayLike<number>, ArrayLike<number>][] = claims.map(claim => {
-        return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];
-    });
+    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
+    try {
+        let issuer = await getIssuer(issuerId);
 
-    const oldState = issuerTree.getIdenState();
-
-    await issuerTree.batchInsertClaimByHiHv(hihv);
-    await issuerTree.batchRevokeClaim([]);
-
-    const newState = issuerTree.getIdenState();
-    const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
-
-    await restoreDb(issuer.pathDb!);
-    await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        await cloneDb(issuer.pathDb!);
+        const hihv: [ArrayLike<number>, ArrayLike<number>][] = claims.map(claim => {
+            return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];
+        });
     
-    return challenge;
+        const oldState = issuerTree.getIdenState();
+    
+        await issuerTree.batchInsertClaimByHiHv(hihv);
+        await issuerTree.batchRevokeClaim([]);
+    
+        const newState = issuerTree.getIdenState();
+        const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
+    
+        await restoreDb(issuer.pathDb!);
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        
+        return challenge;
+    } catch (err: any) {
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        throw(err);
+    }
+    
+    
 }
 
 export async function getRevokeChallenge(claimIds: Array<string>, issuerId: string): Promise<BigInt> {
-    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
-    let issuer = await getIssuer(issuerId);
-
     const claims = await Claim.find({"id": {$in: claimIds}, "status": ClaimStatus.PENDING_REVOKE, "issuerId": issuerId});
     if (claims.length == 0) {
         return BigInt(0);
     }
+    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
+    try {
+        let issuer = await getIssuer(issuerId);
 
-    await cloneDb(issuer.pathDb!);
-    const revNonces: Array<BigInt> = [];
-    claims.forEach(claim => {
-        if (claim.revNonce != undefined) {
-            revNonces.push(BigInt(claim.revNonce));
-        }
-    });
-
-    const oldState = issuerTree.getIdenState();
-
-    await issuerTree.batchInsertClaimByHiHv([]);
-    await issuerTree.batchRevokeClaim(revNonces);
-
-    const newState = issuerTree.getIdenState();
-    const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
-
-    await restoreDb(issuer.pathDb!);
+        await cloneDb(issuer.pathDb!);
+        const revNonces: Array<BigInt> = [];
+        claims.forEach(claim => {
+            if (claim.revNonce != undefined) {
+                revNonces.push(BigInt(claim.revNonce));
+            }
+        });
     
-    await closeLevelDb(claimsDb, revocationDb, rootsDb);
-    return challenge;
+        const oldState = issuerTree.getIdenState();
+    
+        await issuerTree.batchInsertClaimByHiHv([]);
+        await issuerTree.batchRevokeClaim(revNonces);
+    
+        const newState = issuerTree.getIdenState();
+        const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
+    
+        await restoreDb(issuer.pathDb!);
+        
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        return challenge;
+    } catch (err: any) {
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        throw(err);
+    }
+    
+    
 }
 
 
 export async function getPublishAndRevkeChallenge(claimIdsPublish: Array<string>, claimIdsRevoke: Array<string>, issuerId: string): Promise<BigInt> {
-    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
-    let issuer = await getIssuer(issuerId);
 
     const claimsPublish = await Claim.find({"id": {$in: claimIdsPublish}, "status": ClaimStatus.PENDING, "issuerId": issuerId});
 
@@ -76,30 +88,39 @@ export async function getPublishAndRevkeChallenge(claimIdsPublish: Array<string>
     if (claimsRevoke.length == 0 && claimsPublish.length == 0) {
         return BigInt(0);
     }
+    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
+    try {
 
-    await cloneDb(issuer.pathDb!);
-    const revNonces: Array<BigInt> = [];
-    claimsRevoke.forEach(claim => {
-        if (claim.revNonce != undefined) {
-            revNonces.push(BigInt(claim.revNonce));
-        }
-    });
+        let issuer = await getIssuer(issuerId);
 
-    const hihv: [ArrayLike<number>, ArrayLike<number>][] = claimsPublish.map(claim => {
-        return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];
-    });
 
-    const oldState = issuerTree.getIdenState();
-
-    await issuerTree.batchInsertClaimByHiHv(hihv);
-    await issuerTree.batchRevokeClaim(revNonces);
-
-    const newState = issuerTree.getIdenState();
-    const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
-
-    await restoreDb(issuer.pathDb!);
-    await closeLevelDb(claimsDb, revocationDb, rootsDb);
-    return challenge;
+        await cloneDb(issuer.pathDb!);
+        const revNonces: Array<BigInt> = [];
+        claimsRevoke.forEach(claim => {
+            if (claim.revNonce != undefined) {
+                revNonces.push(BigInt(claim.revNonce));
+            }
+        });
+    
+        const hihv: [ArrayLike<number>, ArrayLike<number>][] = claimsPublish.map(claim => {
+            return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];
+        });
+    
+        const oldState = issuerTree.getIdenState();
+    
+        await issuerTree.batchInsertClaimByHiHv(hihv);
+        await issuerTree.batchRevokeClaim(revNonces);
+    
+        const newState = issuerTree.getIdenState();
+        const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
+    
+        await restoreDb(issuer.pathDb!);
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        return challenge;
+    } catch (err: any) {
+        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        throw(err);
+    }
 }
 
 export async function getChallengePublishAllClaims(issuerId: string) {

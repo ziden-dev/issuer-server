@@ -5,7 +5,7 @@ import Claim from "../models/Claim.js";
 import { getPublishAndRevkeChallenge, getPublishChallenge, getRevokeChallenge } from "./Challenge.js";
 import { getIssuer } from "./Issuer.js";
 import { backupLastState, cloneDb, closeLevelDb, restoreDb } from "./LevelDbManager.js";
-import { checkLockTreeState, getTreeState, saveTreeState } from "./TreeState.js";
+import { checkLockTreeState, getTreeState, saveTreeState, saveLastStateTransistion } from "./TreeState.js";
 import fs from "fs-extra";
 import { execSync } from "child_process";
 import { ethers } from "ethers"
@@ -170,6 +170,7 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
         
         if (tx.events[0].event == "StateUpdated") {
             await saveTreeState(issuerTree);
+            await saveLastStateTransistion(issuerId);
             await backupLastState(issuer.pathDb!);
             await closeLevelDb(claimsDb, revocationDb, rootsDb);
             return true;
