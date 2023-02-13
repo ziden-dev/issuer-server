@@ -114,3 +114,5 @@ secret.json
 db/**
 
 src/tmp.ts
+
+src/cron.ts
