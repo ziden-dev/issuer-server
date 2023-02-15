@@ -60,6 +60,10 @@ export class ClaimsController {
             }
 
             let queryResponse = {};
+            const checkLock = await checkLockTreeState(claim.issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
 
             if (type == ProofTypeQuery.MTP) {
                 queryResponse = await getQueryMTPInput(claim.issuerId, claim.hi);
@@ -117,6 +121,11 @@ export class ClaimsController {
             if (!issuerId || typeof issuerId != "string") {
                 throw("Invalid issuerId");
             }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            
             if (!holderId || !registryId || !publicKey || !data
                 || typeof holderId != "string" || typeof registryId != "string" || typeof publicKey != "string") {
                     throw("Invalid data");
@@ -139,6 +148,10 @@ export class ClaimsController {
             const {issuerId} = req.params;
             if (!issuerId || typeof issuerId != "string") {
                 throw("Invalid issuerId");
+            }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
             }
 
             for (let i = 0; i < req.body.length; i++) {
