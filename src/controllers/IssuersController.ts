@@ -4,7 +4,7 @@ import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getAllIssuer, getIssuerInfor } from "../services/Issuer.js";
 import { createNewOperator, disableOperator, getListOperator, getOperatorInfor } from "../services/Operator.js";
-import { registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
+import { checkLockTreeState, registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
 
 export class IssuerController {
     public async registerIssuer(req: Request, res: Response) {
@@ -48,6 +48,11 @@ export class IssuerController {
             const {operatorId} = req.body;
             if (!operatorId || typeof operatorId != "string") {
                 throw("OperatorId invalid!");
+            }
+
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
             }
 
             await createNewOperator(operatorId, issuerId);
