@@ -9,6 +9,7 @@ export class GlobalVariables {
         (left: BigInt, right: BigInt): BigInt;
     };
     public static eddsa: zidenjsParams.EDDSA;
+    public static levelDb: any = {};
 
     constructor() {
     }

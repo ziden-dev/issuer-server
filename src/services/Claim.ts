@@ -38,7 +38,7 @@ export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: str
         versionClaim = lastClaim[0].version! + 1;
     }
     claim.setVersion(BigInt(versionClaim));
-    const {claimsDb, revocationDb, rootsDb, issuerTree} = await getTreeState(issuerId);
+    const issuerTree = await getTreeState(issuerId);
     
     try {
         await issuerTree.prepareClaimForInsert(claim);
@@ -60,10 +60,10 @@ export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: str
         });
         await newClaim.save();
         await saveTreeState(issuerTree);
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return claimId;
     } catch (err: any) {
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }
@@ -93,35 +93,35 @@ export async function getClaimByClaimId(claimId: string) {
 }
 
 export async function getQueryMTPInput(issuerId: string, hi: string) {
-    const {claimsDb, revocationDb, rootsDb, issuerTree} = await getTreeState(issuerId);
+    const issuerTree = await getTreeState(issuerId);
     try {
         const kycQueryMTPInput = await zidenjsWitness.queryMTP.kycGenerateQueryMTPInput(
             GlobalVariables.F.e(hi),
             issuerTree
         );
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return {
             kycQueryMTPInput: JSON.parse(serializaData(kycQueryMTPInput))
         }
     } catch (err: any) {
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }
 
 export async function getNonRevQueryMTPInput(issuerId: string, revNonce: number) {
-    const {claimsDb, revocationDb, rootsDb, issuerTree} = await getTreeState(issuerId);
+    const issuerTree = await getTreeState(issuerId);
     try {
         const kycNonRevQueryMTPInput = await zidenjsWitness.queryMTP.kycGenerateNonRevQueryMTPInput(
             BigInt(revNonce),
             issuerTree
         );
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return {
             kycQueryMTPInput: JSON.parse(serializaData(kycNonRevQueryMTPInput))
         }
     } catch (err: any) {
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }

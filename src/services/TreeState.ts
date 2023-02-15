@@ -10,6 +10,7 @@ import { checkIssuerExisted, getIssuer, getIssuerIdByPublicKey, updateIssuer } f
 import Claim from "../models/Claim.js";
 import { checkTreeLock, lockTree, unlockTree } from "./TreeLock.js";
 import { checkOperatorExisted, saveNewOperator } from "./Operator.js";
+import { GlobalVariables } from "../common/config/global.js";
 
 export async function saveTreeState(issuerTree: zidenjsTrees.Trees) {
     const issuerId = zidenjsUtils.bufferToHex(issuerTree.userID);
@@ -77,22 +78,23 @@ export async function getTreeState(issuerId: string) {
         throw("Issuer not exist");
     }
 
-    const {claimsDb, revocationDb, rootsDb} = await openLevelDb(issuer.pathDb);
+    await openLevelDb(issuer.pathDb);
+    const src = issuer.pathDb;
     const claimsTree = new zidenjsTrees.smt.BinSMT(
-        claimsDb,
-        await claimsDb.getRoot(),
+        GlobalVariables.levelDb[src].claimsDb,
+        await GlobalVariables.levelDb[src].claimsDb.getRoot(),
         32
     );
 
     const revocationTree = new zidenjsTrees.smt.BinSMT(
-        revocationDb,
-        await revocationDb.getRoot(),
+        GlobalVariables.levelDb[src].revocationDb,
+        await GlobalVariables.levelDb[src].revocationDb.getRoot(),
         32
     );
 
     const rootsTree = new zidenjsTrees.smt.BinSMT(
-        rootsDb,
-        await rootsDb.getRoot(),
+        GlobalVariables.levelDb[src].rootsDb,
+        await GlobalVariables.levelDb[src].rootsDb.getRoot(),
         32
     );
 
@@ -106,7 +108,7 @@ export async function getTreeState(issuerId: string) {
         32
     );
 
-    return {claimsDb, revocationDb, rootsDb, issuerTree};
+    return issuerTree;
 }
 
 export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
@@ -122,16 +124,16 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
 
     await lockTree(serverIssuerId);
     const id = v4();
-    const {pathLevelDb, claimsDb, revocationDb, rootsDb} = await createNewLevelDb(id);
+    const pathLevelDb = await createNewLevelDb(id);
     
     try {
     
         const newIssuerAuthClaim = await zidenjsClaim.authClaim.newAuthClaimFromPublicKey(BigInt(pubkeyX), BigInt(pubkeyY));
         const newIssuerTree = await zidenjsTrees.Trees.generateID(
             [newIssuerAuthClaim],
-            claimsDb,
-            revocationDb,
-            rootsDb,
+            GlobalVariables.levelDb[pathLevelDb].claimsDb,
+            GlobalVariables.levelDb[pathLevelDb].revocationDb,
+            GlobalVariables.levelDb[pathLevelDb].rootsDb,
             zidenjsClaim.id.IDType.Default,
             32,
             0
@@ -150,7 +152,7 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
         await zidenjsWitness.stateTransition.stateTransitionWitness(
             serverPrivateKey,
             serverAuthClaim,
-            serverAuthenTree.issuerTree,
+            serverAuthenTree,
             [newIssuerAdminClaim],
             []
         );
@@ -162,7 +164,7 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
             pathLevelDb
         );
     
-        await saveTreeState(serverAuthenTree.issuerTree);
+        await saveTreeState(serverAuthenTree);
         await saveTreeState(newIssuerTree);
     
         const newClaim = new Claim({
@@ -178,7 +180,7 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
             status: ClaimStatus.ACTIVE,
             userId: zidenjsUtils.bufferToHex(newIssuerTree.userID),
             proofType: ProofType.MTP,
-            issuerId: zidenjsUtils.bufferToHex(serverAuthenTree.issuerTree.userID),
+            issuerId: zidenjsUtils.bufferToHex(serverAuthenTree.userID),
             schemaRegistryId: "",
         });
     
@@ -191,8 +193,8 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
             await saveNewOperator(newClaim.issuerId!, OperatorType.ADMIN, newClaim.id!, newClaim.issuerId!);
         }
 
-        await closeLevelDb(serverAuthenTree.claimsDb, serverAuthenTree.revocationDb, serverAuthenTree.rootsDb);
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(serverAuthenTree.claimsDb, serverAuthenTree.revocationDb, serverAuthenTree.rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return {
             issuerId: zidenjsUtils.bufferToHex(newIssuerTree.userID),
             claimId: newClaim.id,
@@ -201,7 +203,7 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
         };
     } catch (err: any) {
         await unlockTree(serverIssuerId);
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }
@@ -213,15 +215,15 @@ export async function setupAuthenTree() {
         return;
     }
 
-    const {pathLevelDb, claimsDb, revocationDb, rootsDb} = await createNewLevelDb(serverAuthenTreeId);
+    const pathLevelDb = await createNewLevelDb(serverAuthenTreeId);
 
     const serverAuthClaim = await zidenjsClaim.authClaim.newAuthClaimFromPublicKey(BigInt(PUBKEYX), BigInt(PUBKEYY));
 
     const authenTree = await zidenjsTrees.Trees.generateID(
         [serverAuthClaim],
-        claimsDb,
-        revocationDb,
-        rootsDb,
+        GlobalVariables.levelDb[pathLevelDb].claimsDb,
+        GlobalVariables.levelDb[pathLevelDb].revocationDb,
+        GlobalVariables.levelDb[pathLevelDb].rootsDb,
         zidenjsClaim.id.IDType.Default,
         32,
         0
@@ -232,7 +234,7 @@ export async function setupAuthenTree() {
 
     await saveTreeState(authenTree);
 
-    await closeLevelDb(claimsDb, revocationDb, rootsDb);
+    // await closeLevelDb(claimsDb, revocationDb, rootsDb);
 }
 
 export async function restoreLastStateTransition(issuerId: string) {

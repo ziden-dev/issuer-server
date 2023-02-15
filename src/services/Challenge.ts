@@ -13,7 +13,7 @@ export async function getPublishChallenge(claimIds: Array<string>, issuerId: str
         return BigInt(0);
     }
 
-    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
+    let issuerTree = await getTreeState(issuerId);
     try {
         let issuer = await getIssuer(issuerId);
 
@@ -31,11 +31,11 @@ export async function getPublishChallenge(claimIds: Array<string>, issuerId: str
         const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
     
         await restoreDb(issuer.pathDb!);
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         
         return challenge;
     } catch (err: any) {
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
     
@@ -47,7 +47,7 @@ export async function getRevokeChallenge(claimIds: Array<string>, issuerId: stri
     if (claims.length == 0) {
         return BigInt(0);
     }
-    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
+    let issuerTree = await getTreeState(issuerId);
     try {
         let issuer = await getIssuer(issuerId);
 
@@ -69,10 +69,10 @@ export async function getRevokeChallenge(claimIds: Array<string>, issuerId: stri
     
         await restoreDb(issuer.pathDb!);
         
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return challenge;
     } catch (err: any) {
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
     
@@ -88,7 +88,7 @@ export async function getPublishAndRevkeChallenge(claimIdsPublish: Array<string>
     if (claimsRevoke.length == 0 && claimsPublish.length == 0) {
         return BigInt(0);
     }
-    let {claimsDb, rootsDb, revocationDb, issuerTree} = await getTreeState(issuerId);
+    let issuerTree = await getTreeState(issuerId);
     try {
 
         let issuer = await getIssuer(issuerId);
@@ -115,10 +115,10 @@ export async function getPublishAndRevkeChallenge(claimIdsPublish: Array<string>
         const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
     
         await restoreDb(issuer.pathDb!);
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         return challenge;
     } catch (err: any) {
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }

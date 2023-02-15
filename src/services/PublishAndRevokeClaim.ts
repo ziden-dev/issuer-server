@@ -117,7 +117,7 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
     const issuer = await getIssuer(issuerId);
     await cloneDb(issuer.pathDb!);
     const authClaim = await zidenjsClaim.authClaim.newAuthClaimFromPublicKey(BigInt(issuer.pubkeyX!), BigInt(issuer.pubkeyY!));
-    const {claimsDb, revocationDb, rootsDb, issuerTree} = await getTreeState(issuerId);
+    const issuerTree = await getTreeState(issuerId);
     try {
         const stateTransitionInputs = await zidenjsWitness.stateTransition.stateTransitionWitnessWithHiHvWithSignature(
             signature,
@@ -172,16 +172,16 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
             await saveTreeState(issuerTree);
             await saveLastStateTransistion(issuerId);
             await backupLastState(issuer.pathDb!);
-            await closeLevelDb(claimsDb, revocationDb, rootsDb);
+            // await closeLevelDb(claimsDb, revocationDb, rootsDb);
             return true;
         } else {
             await restoreDb(issuer.pathDb!);
-            await closeLevelDb(claimsDb, revocationDb, rootsDb);
+            // await closeLevelDb(claimsDb, revocationDb, rootsDb);
             return false;
         }
     } catch (err: any) {
         await restoreDb(issuer.pathDb!);
-        await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         console.log(err);
         return false;
     }
