@@ -131,11 +131,20 @@ export async function getAllSchema() {
 
 export async function getSchemaBySchemaHash(schemaHash: string) {
     const schema = await Schema.findOne({"@hash": schemaHash}).select('-__v').select('-_id');
+
     if (!schema) {
-        throw("schemaHash not exist!");
-    } else {
-        return schema;
+        throw("SchemaHash not existed!");
     }
+    const schemaRaw = await getRawSchema(schemaHash);
+    const schemaResponse: any = {
+        "@name": schema["@name"],
+        "@type": schema["@type"],
+        "@id": schema["@id"],
+        "@hash": schema["@hash"],
+        ...schemaRaw
+    };
+
+    return schemaResponse;
 }
 
 
