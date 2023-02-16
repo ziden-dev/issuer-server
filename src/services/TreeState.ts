@@ -188,9 +188,9 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
         
         await unlockTree(serverIssuerId);
 
-        const checkOperator = await checkOperatorExisted(newClaim.issuerId!, newClaim.issuerId!);
+        const checkOperator = await checkOperatorExisted(newClaim.userId!, newClaim.userId!);
         if (!checkOperator) {
-            await saveNewOperator(newClaim.issuerId!, OperatorType.ADMIN, newClaim.id!, newClaim.issuerId!);
+            await saveNewOperator(newClaim.userId!, OperatorType.ADMIN, newClaim.id!, newClaim.userId!);
         }
 
         // await closeLevelDb(serverAuthenTree.claimsDb, serverAuthenTree.revocationDb, serverAuthenTree.rootsDb);
