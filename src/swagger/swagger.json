@@ -1844,17 +1844,17 @@
       "Network": {
         "type": "object",
         "properties": {
-          "chainId": {
-            "type": "string",
-            "example": "chainId"
+          "networdId": {
+            "type": "integer",
+            "example": 97
           },
           "name": {
             "type": "string",
-            "example": "name"
+            "example": "Binance Smart Chain Testnet"
           },
           "shotName": {
             "type": "string",
-            "name": "shotName"
+            "name": "bnbt"
           }
         }
       },
@@ -1912,9 +1912,9 @@
             "type": "boolean",
             "example": false
           },
-          "network": {
-            "type": "string",
-            "example": "network"
+          "networkId": {
+            "type": "integer",
+            "example": 97
           },
           "endpointUrl": {
             "type": "string",
