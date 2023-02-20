@@ -256,6 +256,11 @@
     },
     "/api/v1/issuers/{issuerId}/operators": {
       "post": {
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
         "tags": [
           "issuers"
         ],
@@ -305,11 +310,6 @@
         }
       },
       "get": {
-        "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
-        ],
         "tags": [
           "issuers"
         ],
