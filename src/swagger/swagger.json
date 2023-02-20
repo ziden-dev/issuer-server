@@ -83,7 +83,7 @@
         }
       }
     },
-    "/api/v1/authen/verify-token/{issuerId}": {
+    "/api/v1/auth/verify-token/{issuerId}": {
       "post": {
         "tags": [
           "auth"
