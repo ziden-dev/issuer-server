@@ -7,11 +7,11 @@ export class NetworkController {
     public async createNewNetwork(req: Request, res: Response) {
         try {
 
-            const { chainId, name, shotName } = req.body;
-            if (!chainId || !name || !shotName || typeof (chainId) != "string" || typeof (name) != "string" || typeof (shotName) != "string") {
+            const { networkId, name, shotName } = req.body;
+            if (!networkId || !name || !shotName || typeof (networkId) != "number" || typeof (name) != "string" || typeof (shotName) != "string") {
                 throw ("invalid input")
             }
-            const network = await createNetwork(chainId, name, shotName);
+            const network = await createNetwork(networkId, name, shotName);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, network, ResultMessage.APISUCCESS.message));
 
         } catch (err: any) {
@@ -33,8 +33,8 @@ export class NetworkController {
     public async getNetworkById(req: Request, res: Response) {
         try {
             const { networkId } = req.params;
-            if (!networkId || typeof (networkId) != "string") {
-                throw ("invalid id");
+            if (!networkId || typeof (networkId) != "number") {
+                throw ("invalid networkId");
             }
             const network = await getNetworkById(networkId);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, network, ResultMessage.APISUCCESS.message));
@@ -47,11 +47,15 @@ export class NetworkController {
     public async updateNetworkConfig(req: Request, res: Response) {
         try {
             const { networkId } = req.params;
-            const { chainId, name, shotName } = req.body;
-            if (!chainId || !name || !shotName || !networkId || typeof (chainId) != "string" || typeof (name) != "string" || typeof (shotName) != "string" || typeof (networkId) != "string") {
+            if (!networkId || typeof (networkId) != "number") {
+                throw ("invalid networkId");
+            }
+
+            const { name, shotName } = req.body;
+            if (!name || !shotName || !networkId || typeof (name) != "string" || typeof (shotName) != "string" || typeof (networkId) != "string") {
                 throw ("invalid input");
             }
-            const network = await updateNetwork(networkId, chainId, name, shotName);
+            const network = await updateNetwork(networkId, name, shotName);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, network, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
@@ -62,9 +66,10 @@ export class NetworkController {
     public async removeNetwork(req: Request, res: Response) {
         try {
             const { networkId } = req.params;
-            if (!networkId || typeof (networkId) != "string") {
-                throw ("invalid id");
+            if (!networkId || typeof (networkId) != "number") {
+                throw ("invalid networkId");
             }
+            
             await removeNetwork(networkId);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
         } catch (err: any) {

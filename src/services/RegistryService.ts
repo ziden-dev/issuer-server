@@ -1,5 +1,7 @@
 import { v4 } from "uuid";
+import Claim from "../models/Claim.js";
 import Issuer from "../models/Issuer.js";
+import Network from "../models/Network.js";
 import Schema from "../models/Schema.js";
 import SchemaRegistry from "../models/SchemaRegistry.js";
 
@@ -41,6 +43,11 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
     if (!issuer) {
         throw("issuerId not exist!");
     }
+    
+    const networkSchema = await Network.findOne({networkId: network});
+    if (!networkSchema) {
+        throw("networkId not exist!");
+    }
 
     const newRegistry = new SchemaRegistry({
         id: v4(),
@@ -51,14 +58,14 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
         updatable: updateble,
         endpointUrl: endpointUrl,
         isActive: true,
-        network: network,
+        networkId: network
     });
 
     await newRegistry.save();
     return newRegistry;
 }
 
-export async function findSchemaRegistry(schemaHash: string, issuerId: string, network: string) {
+export async function findSchemaRegistry(schemaHash: string, issuerId: string, network: number) {
     let query: any = {};
     if (schemaHash != "") {
         query["schemaHash"] = schemaHash;
@@ -68,13 +75,18 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
         query["issuerId"] = issuerId;
     }
 
-    if (network != "") {
-        query["network"] = network;
+    if (network != 0) {
+        query["network.networkId"] = network;
     }
 
     const registries = await SchemaRegistry.find(query);
     const response: Array<any> = [];
-    registries.forEach(registry => {
+
+    for (let i = 0; i < registries.length; i++) {
+        let registry = registries[i];
+
+        const numClaims = await Claim.countDocuments({"schemaRegistryId": registry.id});
+
         response.push({
             id: registry.id,
             schemaHash: registry.schemaHash,
@@ -82,16 +94,20 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
             description: registry.description,
             expiration: registry.expiration,
             updatable: registry.updatable,
-            network: registry.network,
+            network: {
+                networkId: registry.network?.networkId,
+                name: registry.network?.name
+            },
             endpointUrl: registry.endpointUrl,
-            isActive: registry.isActive
+            isActive: registry.isActive,
+            numClaims: numClaims
         });
-    })
+    }
 
     return response;
 }
 
-export async function updateRegistry(registryId: string, schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, network: string, endpointUrl: string) {
+export async function updateRegistry(registryId: string, schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, networkId: number, endpointUrl: string) {
     const registry = await SchemaRegistry.findOne({id: registryId});
     if (!registry) {
         throw("registryId not exist!");
@@ -107,12 +123,20 @@ export async function updateRegistry(registryId: string, schemaHash: string, iss
         throw("issuerId not exist!");
     }
 
+    const network = await Network.findOne({networkId: networkId});
+    if (!network) {
+        throw("networkId not exist!");
+    }
+
     registry.schemaHash = schemaHash;
     registry.issuerId = issuerId;
     registry.description = description;
     registry.expiration = expiration;
     registry.updatable = updateble;
-    registry.network = network;
+    registry.network = {
+        networkId: network.networkId,
+        name: network.name
+    };
     registry.endpointUrl = endpointUrl;
 
     await registry.save();
