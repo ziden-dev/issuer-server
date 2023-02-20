@@ -75,7 +75,8 @@ export class AuthenController {
           let isValid = false;
           try {
             const authenIsser = await getAuthenIssuerId();
-            if ((await parsedToken.verifyToken(vk, Role.Admin, schemaHash, authenIsser!, timeLimit))) {
+            const authenIssuerId = BigInt("0x" + authenIsser!).toString();
+            if ((await parsedToken.verifyToken(vk, Role.Admin, schemaHash, authenIssuerId, timeLimit))) {
               isValid = true;
             }
           } catch (err) {
@@ -162,7 +163,9 @@ export class AuthenController {
       const issuer = BigInt("0x" + issuerId).toString();
       let isValid = false;
       try {
-        if ((await parsedToken.verifyToken(vk, Role.Admin, schemaHash, issuer, timeLimit))) {
+        const authenIsser = await getAuthenIssuerId();
+        const authenIssuerId = BigInt("0x" + authenIsser!).toString();
+        if ((await parsedToken.verifyToken(vk, Role.Admin, schemaHash, authenIssuerId, timeLimit))) {
           isValid = true;
         }
       } catch (err) {

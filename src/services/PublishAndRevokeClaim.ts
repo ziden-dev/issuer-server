@@ -130,7 +130,7 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
         // Generate proof
         const statePath = "build/stateTransition"
         const rapidSnarkPath = "build/rapidSnark"
-        const rand = Date.now().toString() + (Math.floor(Math.random() * 10)).toString();
+        const rand = Date.now().toString() + (Math.floor(Math.random() * 1000)).toString();
         fs.writeFileSync(`${statePath}/${rand}input.json`, (serializaData(stateTransitionInputs)));
         // execSync(`npx snarkjs calculatewitness ${statePath}/stateTransition.wasm ${statePath}/input.json ${statePath}/witness.wtns`)
         // execSync(`npx snarkjs groth16 prove ${statePath}/state_final.zkey ${statePath}/witness.wtns ${statePath}/proof.json ${statePath}/public.json`)
