@@ -5,7 +5,7 @@ import Network from "../models/Network.js";
 import Schema from "../models/Schema.js";
 import SchemaRegistry from "../models/SchemaRegistry.js";
 
-export async function createNewRegistry(schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, network: string, endpointUrl: string) {    
+export async function createNewRegistry(schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, networkId: number, endpointUrl: string) {    
     if (!schemaHash) {
         schemaHash = "";
     }
@@ -22,8 +22,8 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
         updateble = false;
     }
 
-    if (!network) {
-        network = "";
+    if (networkId == undefined || networkId == null) {
+        networkId = 0;
     }
 
     if (!endpointUrl) {
@@ -44,7 +44,7 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
         throw("issuerId not exist!");
     }
     
-    const networkSchema = await Network.findOne({networkId: network});
+    const networkSchema = await Network.findOne({networkId: networkId});
     if (!networkSchema) {
         throw("networkId not exist!");
     }
@@ -58,14 +58,30 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
         updatable: updateble,
         endpointUrl: endpointUrl,
         isActive: true,
-        networkId: network
+        networkId: networkId
     });
 
     await newRegistry.save();
-    return newRegistry;
+    return {
+        id: newRegistry.id,
+        schema: {
+            name: schema["@name"],
+            hash: schema["@hash"]
+        },
+        issuerId: issuerId,
+        description: description,
+        expiration: expiration,
+        updatable: updateble,
+        endpointUrl: endpointUrl,
+        isActive: true,
+        network: {
+            networkId: networkSchema.networkId,
+            name: networkSchema.name
+        }
+    };
 }
 
-export async function findSchemaRegistry(schemaHash: string, issuerId: string, network: number) {
+export async function findSchemaRegistry(schemaHash: string, issuerId: string, networkId: number) {
     let query: any = {};
     if (schemaHash != "") {
         query["schemaHash"] = schemaHash;
@@ -75,8 +91,8 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
         query["issuerId"] = issuerId;
     }
 
-    if (network != 0) {
-        query["network.networkId"] = network;
+    if (networkId != 0) {
+        query["networkId"] = networkId;
     }
 
     const registries = await SchemaRegistry.find(query);
@@ -86,17 +102,22 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string, n
         let registry = registries[i];
 
         const numClaims = await Claim.countDocuments({"schemaRegistryId": registry.id});
+        const network = await Network.findOne({networkId: registry.networkId});
+        const schema = await Schema.findOne({"@hash": registry.schemaHash});
 
         response.push({
             id: registry.id,
-            schemaHash: registry.schemaHash,
+            schema: {
+                name: schema!["@name"],
+                hash: schema!["@hash"]
+            },
             issuerId: registry.issuerId,
             description: registry.description,
             expiration: registry.expiration,
             updatable: registry.updatable,
             network: {
-                networkId: registry.network?.networkId,
-                name: registry.network?.name
+                networkId: network!.networkId,
+                name: network!.name
             },
             endpointUrl: registry.endpointUrl,
             isActive: registry.isActive,
@@ -133,10 +154,7 @@ export async function updateRegistry(registryId: string, schemaHash: string, iss
     registry.description = description;
     registry.expiration = expiration;
     registry.updatable = updateble;
-    registry.network = {
-        networkId: network.networkId,
-        name: network.name
-    };
+    registry.networkId = networkId;
     registry.endpointUrl = endpointUrl;
 
     await registry.save();

@@ -7,10 +7,7 @@ const SchemaRegistry = new mongoose.Schema({
     description: String,
     expiration: Number,
     updatable: Boolean,
-    network: {
-        networkId: Number,
-        name: String
-    },
+    networkId: Number,
     endpointUrl: String,
     isActive: Boolean
 })
