@@ -193,7 +193,13 @@ export class ClaimsController {
 
     public async revokeListClaims(req: Request, res: Response) {
         try {
+            const {issuerId} = req.params;
+            if (issuerId == undefined || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+
             const {revNonces} = req.body;
+
             if (revNonces == undefined || revNonces.length == 0) {
                 throw ("Required array revNonces to revoke");
             }
@@ -202,8 +208,8 @@ export class ClaimsController {
                     throw("revNonces must be array number");
                 }
             });
-            const claims = await setRevokeClaim(revNonces);
-            res.status(400).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
+            const claims = await setRevokeClaim(revNonces, issuerId);
+            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
