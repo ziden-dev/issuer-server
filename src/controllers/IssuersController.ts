@@ -50,13 +50,13 @@ export class IssuerController {
                 throw("OperatorId invalid!");
             }
 
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
+            let token = req.headers.authorization;
+            if (!token || typeof token != "string") {
+                throw("Invalid token");
             }
 
-            await createNewOperator(operatorId, issuerId);
-            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
+            const response = await createNewOperator(operatorId, issuerId, token);
+            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -72,6 +72,11 @@ export class IssuerController {
 
             if (!operatorId || typeof operatorId != "string") {
                 throw("OperatorId invalid!");
+            }
+
+            let token = req.headers.authorization;
+            if (!token || typeof token != "string") {
+                throw("Invalid token");
             }
 
             await disableOperator(operatorId, issuerId);

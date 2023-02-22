@@ -11,6 +11,7 @@ import { createClaim, encodeClaim, getClaimByClaimId, getClaimStatus, getEntryDa
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
 import Schema from "../models/Schema.js";
 import { createNewSchema } from "../services/Schema.js";
+import { checkAuthenClaimExist, getAuthenProof } from "../services/Authen.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
@@ -54,7 +55,21 @@ export class ClaimsController {
                 throw("Invalid claimId!");
             }
 
+            if (type != ProofTypeQuery.MTP && type != ProofTypeQuery.NON_REV_MTP) {
+                throw("Invalid type");
+            }
+
+            const checkAuthenClaim = await checkAuthenClaimExist(id);
+            if (checkAuthenClaim) {
+                const response = await getAuthenProof(id, type);
+                res.status(200).send(
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message)
+                );
+                return;
+            }
+
             const claim = await getClaimByClaimId(id);
+        
             if (claim.status != ClaimStatus.ACTIVE) {
                 throw("Claim is not ACTIVE");
             }

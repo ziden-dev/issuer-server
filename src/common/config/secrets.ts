@@ -14,3 +14,5 @@ export const ZIDEN_SERVER_URI = process.env.ZIDEN_SERVER_URI ?? "http://128.199.
 export const PUBKEYX = process.env.PUBKEYX ?? "0";
 export const PUBKEYY = process.env.PUBKEYY ?? "0";
 export const PRIVATEKEY = process.env.PRIVATEKEY ?? "0";
+
+export const AUTHEN_SERVER = process.env.AUTHEN_SERVER ?? "http://localhost:3001"; 
