@@ -20,6 +20,7 @@ export class AuthenController {
     try {
       const {issuerId} = req.params;
       const token = await login(req.body, issuerId);
+      res.status(200).send({ token: token });
       return token;
     } catch (err: any) {
       res.status(400).send(buildErrorMessage(400, "Invalid request", "Unable to login"));

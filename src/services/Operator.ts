@@ -1,7 +1,7 @@
 import Operator from "../models/Operator.js";
 import { OperatorType } from "../common/enum/EnumType.js";
 import { getClaimByClaimId, saveClaim } from "./Claim.js";
-import { createOperator, revokeOperator } from "./Authen.js";
+import { createOperator, getOperatorInforInAuthen, revokeOperator } from "./Authen.js";
 import AuthenClaim from "../models/AuthenClaim.js";
 
 export async function saveNewOperator(userId: string, role: number, claimId: string, issuerId: string) {
@@ -91,16 +91,20 @@ export async function getOperatorInfor(operatorId: string, issuerId: string) {
     if (!operator.activate) {
         throw("Operator not activate");
     }
-    const claim = await getClaimByClaimId(operator.claimId!);
-    return {
-        userId: operator.userId!,
-        issuerId: operator.issuerId!,
-        role: operator.role!,
-        claimId: operator.claimId,
-        schemaHash: claim.schemaHash,
-        version: claim.version,
-        revNonce: claim.revNonce
-    }
+    // const claim = await getClaimByClaimId(operator.claimId!);
+    // return {
+    //     userId: operator.userId!,
+    //     issuerId: operator.issuerId!,
+    //     role: operator.role!,
+    //     claimId: operator.claimId,
+    //     schemaHash: claim.schemaHash,
+    //     version: claim.version,
+    //     revNonce: claim.revNonce
+    // }
+
+    const response = await getOperatorInforInAuthen(operatorId, issuerId);
+    return response;
+
 }
 
 export async function deleteOperator(userId: string, issuerId: string, token: string) {

@@ -142,3 +142,12 @@ export async function checkAuthenClaimExist(claimId: string) {
         return false;
     }
 }
+
+export async function getOperatorInforInAuthen(operatorId: string, issuerId: string) {
+    let url = AUTHEN_SERVER + `/api/v1/issuers/${issuerId}/operators/${operatorId}`;
+    const response = await axios.request({
+        method: "GET",
+        url: url
+    });
+    return response.data;
+}
