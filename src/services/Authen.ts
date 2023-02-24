@@ -88,7 +88,7 @@ export async function registerNewIssuer(issuerId: string) {
             method: "POST",
             url: url,
             data: {
-                "issuerId": issuerId
+                "userId": issuerId
             }
         });
 
