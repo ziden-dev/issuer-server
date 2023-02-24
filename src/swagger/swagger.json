@@ -1598,11 +1598,11 @@
             }
           },
           {
-            "name": "network",
+            "name": "networkId",
             "in": "query",
             "description": "network",
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
