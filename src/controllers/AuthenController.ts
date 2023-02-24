@@ -5,7 +5,7 @@ import path from 'path'
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getAuthenIssuerId } from "../services/Issuer.js";
-import { login, verifyToken } from "../services/Authen.js";
+import { login, verfifyTokenWithRole, verifyTokenAdmin } from "../services/Authen.js";
 
 let vk = JSON.parse(fs.readFileSync(path.resolve("./build/authen/verification_key.json"), 'utf-8'));
 enum Role {
@@ -42,7 +42,10 @@ export class AuthenController {
       if (typeof token != "string") {
         throw("Invalid token");
       }
-      const isValid = await verifyToken(token, issuerId, false);
+      let isValid = await verifyTokenAdmin(token, issuerId);
+      if (!isValid) {
+        isValid = await verfifyTokenWithRole(token, issuerId, 2);
+      }
       if (!isValid) {
         throw("Invalid token");
       } else {
@@ -70,7 +73,7 @@ export class AuthenController {
       if (typeof token != "string") {
         throw("Invalid token");
       }
-      const isValid = await verifyToken(token, issuerId, true);
+      const isValid = await verifyTokenAdmin(token, issuerId);
       if (!isValid) {
         throw("Invalid token");
       } else {
@@ -95,7 +98,10 @@ export class AuthenController {
         throw("Invalid token");
       }
 
-      const isValid = await verifyToken(token, issuerId, false);
+      let isValid = await verifyTokenAdmin(token, issuerId);
+      if (!isValid) {
+        isValid = await verfifyTokenWithRole(token, issuerId, 2);
+      }
       res.send(
         buildResponse(ResultMessage.APISUCCESS.apiCode, {isValid: isValid}, ResultMessage.APISUCCESS.message)
       );

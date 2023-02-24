@@ -2,19 +2,15 @@ import axios from "axios";
 import { AUTHEN_SERVER } from "../common/config/secrets.js";
 import AuthenClaim from "../models/AuthenClaim.js";
 
-export async function verifyToken(token: string, issuerId: string, isAdmin: boolean) {
+export async function verifyTokenAdmin(token: string, issuerId: string) {
     try {
         if (!token || !issuerId) {
             return false;
         }
     
-        let url = AUTHEN_SERVER;
-        if (isAdmin) {
-            url += `/api/v1/auth/verify-token-admin/${issuerId}`;
-        } else {
-            url += `/api/v1/auth/verify-token/${issuerId}`;
-        }
-    
+        let url = AUTHEN_SERVER + `/api/v1/auth/verify-token-admin/${issuerId}`;
+
+
         const response = await axios.request({
             method: "POST",
             url: url,
@@ -32,6 +28,33 @@ export async function verifyToken(token: string, issuerId: string, isAdmin: bool
         return false;
     }
     
+}
+
+export async function verfifyTokenWithRole(token: string, issuerId: string, role: number) {
+    try {
+        if (!token || !issuerId) {
+            return false;
+        }
+    
+        let url = AUTHEN_SERVER + `/api/v1/auth/verify-token/${issuerId}`;
+        
+        const response = await axios.request({
+            method: "POST",
+            url: url,
+            data: {
+                "token": token,
+                "role": role
+            }
+        });
+    
+        if (response.data["isValid"]) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err: any) {
+        return false;
+    }
 }
 
 export async function login(data: any, issuerId: string) {
@@ -60,7 +83,7 @@ export async function login(data: any, issuerId: string) {
 
 export async function registerNewIssuer(issuerId: string) {
     try {
-        const url = AUTHEN_SERVER + "/api/v1/issuers/register";
+        const url = AUTHEN_SERVER + "/api/v1/register";
         const response = await axios.request({
             method: "POST",
             url: url,
@@ -71,7 +94,7 @@ export async function registerNewIssuer(issuerId: string) {
 
         return {
             userId: response.data.userId,
-            issuerId: response.data.issuerId,
+            issuerId: response.data.adminId,
             operator: response.data.operator,
             claimId: response.data.claimId,
             version: response.data.version,
@@ -84,12 +107,13 @@ export async function registerNewIssuer(issuerId: string) {
 
 export async function createOperator(operatorId: string, issuerId: string, token: string) {
     try {
-        const url = AUTHEN_SERVER + `/api/v1/issuers/${issuerId}/operators`;
+        const url = AUTHEN_SERVER + `/api/v1/${issuerId}/operators`;
         const response = await axios.request({
             method: "POST",
             url: url,
             data: {
-                "operatorId": operatorId
+                "operatorId": operatorId,
+                "role": 2
             },
             headers: {
                 "Authorization": token
@@ -98,7 +122,7 @@ export async function createOperator(operatorId: string, issuerId: string, token
 
         return {
             userId: response.data.userId,
-            issuerId: response.data.issuerId,
+            issuerId: response.data.adminId,
             operator: response.data.operator,
             claimId: response.data.claimId,
             version: response.data.version,
@@ -111,7 +135,7 @@ export async function createOperator(operatorId: string, issuerId: string, token
 
 export async function revokeOperator(operatorId: string, issuerId: string, token: string) {
     try {
-        const url = AUTHEN_SERVER + `/api/v1/issuers/${issuerId}/operators/${operatorId}`;
+        const url = AUTHEN_SERVER + `/api/v1/${issuerId}/operators/${operatorId}`;
         const response = await axios.request({
             method: "DELETE",
             url: url,
@@ -144,10 +168,17 @@ export async function checkAuthenClaimExist(claimId: string) {
 }
 
 export async function getOperatorInforInAuthen(operatorId: string, issuerId: string) {
-    let url = AUTHEN_SERVER + `/api/v1/issuers/${issuerId}/operators/${operatorId}`;
+    let url = AUTHEN_SERVER + `/api/v1/${issuerId}/operators/${operatorId}`;
     const response = await axios.request({
         method: "GET",
         url: url
     });
-    return response.data;
+    return {
+        userId: response.data.userId,
+        issuerId: response.data.adminId,
+        operator: response.data.operator,
+        claimId: response.data.claimId,
+        version: response.data.version,
+        revNonce: response.data.revNonce
+    };
 }
