@@ -76,7 +76,8 @@ export async function getListOperator(issuerId: string) {
             role: operators[i].role,
             claimId: operators[i].claimId,
             issuerId: operators[i].issuerId,
-            activate: operators[i].activate
+            activate: operators[i].activate,
+            activateDate: operators[i].createAt
         });
     }
 
