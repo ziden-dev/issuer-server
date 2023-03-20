@@ -12,6 +12,7 @@ import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
 import Schema from "../models/Schema.js";
 import { createNewSchema } from "../services/Schema.js";
 import { checkAuthenClaimExist, getAuthenProof } from "../services/Authen.js";
+import Claim from "../models/Claim.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
@@ -60,7 +61,8 @@ export class ClaimsController {
             }
 
             const checkAuthenClaim = await checkAuthenClaimExist(id);
-            if (checkAuthenClaim) {
+            const checkClaim = await Claim.findOne({id: id});
+            if (checkAuthenClaim || !checkClaim) {
                 const response = await getAuthenProof(id, type);
                 res.status(200).send(
                     buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message)
