@@ -126,7 +126,7 @@ export async function getNonRevQueryMTPInput(issuerId: string, revNonce: number)
     }
 }
 
-export async function queryClaim( issuerId: string, status: Array<string>, holderId: string, schemaHash: string) {
+export async function queryClaim( issuerId: string, status: Array<string>, holderId: string, schemaHash: string, claimId: Array<string>) {
     let query: any = {};
     if (issuerId != "") {
         query["issuerId"] = issuerId;
@@ -139,6 +139,9 @@ export async function queryClaim( issuerId: string, status: Array<string>, holde
     }
     if (schemaHash != "") {
         query["schemaHash"] = schemaHash;
+    }
+    if (claimId.length != 0) {
+        query["id"] = {"$in": claimId};
     }
 
     const claims = await Claim.find(query);

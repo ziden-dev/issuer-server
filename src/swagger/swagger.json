@@ -545,6 +545,18 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "claimId",
+            "in": "query",
+            "description": "List claimIds",
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string",
+                "description": "search by ClaimIds"
+              }
+            }
           }
         ],
         "responses": {

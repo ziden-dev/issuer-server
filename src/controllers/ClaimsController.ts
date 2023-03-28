@@ -17,7 +17,7 @@ import Claim from "../models/Claim.js";
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
         try {
-            let {issuerId, status, holderId, schemaHash} = req.query;
+            let {issuerId, status, holderId, schemaHash, claimId} = req.query;
             if (!issuerId) {
                 issuerId = "";
             }
@@ -33,12 +33,18 @@ export class ClaimsController {
             if (!schemaHash) {
                 schemaHash = "";
             }
+            if (!claimId) {
+                claimId = [];
+            }
+            if (typeof claimId == "string") {
+                claimId = [claimId];
+            }
 
             if (typeof issuerId != "string" || typeof holderId != "string" || typeof schemaHash != "string") {
                 throw("Invalid query input");
             }
 
-            const claims = await queryClaim(issuerId, status as string[], holderId, schemaHash);
+            const claims = await queryClaim(issuerId, status as string[], holderId, schemaHash, claimId as string[]);
             res.send(
                 buildResponse(ResultMessage.APISUCCESS.apiCode, claims, ResultMessage.APISUCCESS.message)
             );
