@@ -78,22 +78,36 @@ export class ClaimsController {
 
             const claim = await getClaimByClaimId(id);
         
-            if (claim.status != ClaimStatus.ACTIVE) {
+            if (claim[0].status != ClaimStatus.ACTIVE) {
                 throw("Claim is not ACTIVE");
             }
 
             let queryResponse = {};
-            const checkLock = await checkLockTreeState(claim.issuerId);
+            const checkLock = await checkLockTreeState(claim[0].issuerId);
             if (checkLock) {
                 throw("Await Publish!");
             }
 
             if (type == ProofTypeQuery.MTP) {
-                queryResponse = await getQueryMTPInput(claim.issuerId, claim.hi);
+                let hiList: { claimIndex: number; hi: string; }[] = [];
+                claim.forEach((e) => {
+                    hiList.push({
+                        claimIndex: e.claimIndex,
+                        hi: e.hi
+                    });
+                });
+                queryResponse = await getQueryMTPInput(claim[0].issuerId, hiList);
             }
 
             if (type == ProofTypeQuery.NON_REV_MTP) {
-                queryResponse = await getNonRevQueryMTPInput(claim.issuerId, claim.revNonce);
+                let revNonceList: { claimIndex: number; revNonce: number; }[] = [];
+                claim.forEach((e) => {
+                    revNonceList.push({
+                        claimIndex: e.claimIndex,
+                        revNonce: e.revNonce
+                    });
+                })
+                queryResponse = await getNonRevQueryMTPInput(claim[0].issuerId, revNonceList);
             }
 
             res.status(200).send(
@@ -155,10 +169,10 @@ export class ClaimsController {
                 }
             
             const {claim, schemaHash} = await createClaim(data, holderId, registryId);
-            const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
-            const { cipher, nonce, serverPublicKey } = await encodeClaim(claim, data, publicKey);
+            const newClaim = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
+            const { cipher, nonce, serverPublicKey } = await encodeClaim(newClaim.claim, data, publicKey);
             
-            res.send({ claimId: claimId, encodeClaim: cipher, nonce: nonce, serverPublicKey: serverPublicKey });
+            res.send({ claimId: newClaim.claimId, encodeClaim: cipher, nonce: nonce, serverPublicKey: serverPublicKey });
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -186,14 +200,14 @@ export class ClaimsController {
                     }
         
                     const {claim, schemaHash} = await createClaim(data, holderId, registryId);
-                    const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
-            
-                    await saveEntryData(claimId, claim, data);
+                    const newClaim = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
+                    console.log(newClaim);
+                    await saveEntryData(newClaim.claimId, newClaim.claim, data);
 
                     claimResponse.push(
                         {
                             index: i,
-                            claimId: claimId
+                            claimId: newClaim.claimId
                         }
                     );
         

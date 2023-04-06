@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const Entry = new mongoose.Schema({
     claimId: String,
-    entry: [String],
+    entry: [[String]],
     rawData: String
 })
 
