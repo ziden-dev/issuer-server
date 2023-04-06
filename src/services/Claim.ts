@@ -30,96 +30,108 @@ export async function createClaim(data: any, holderId: string, registryId: strin
     return {claim: claim, schemaHash: schemaHash};
 }
 
-export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: string, userId: string, issuerId: string, schemaRegistryId: string) {
+export async function saveClaim(claim: Array<zidenjsClaim.entry.Entry>, schemaHash: string, userId: string, issuerId: string, schemaRegistryId: string) {
     const claimId = v4();
     const lastClaim = await Claim.find({userId: userId, schemaHash: schemaHash}).limit(1).sort({"version": -1});
     let versionClaim = 0;
     if (lastClaim.length != 0) {
         versionClaim = lastClaim[0].version! + 1;
     }
-    claim.setVersion(BigInt(versionClaim));
-    const issuerTree = await getTreeState(issuerId);
+    for (let i = 0; i < claim.length; i++) {
+        claim[i].setVersion(BigInt(versionClaim));
+        const issuerTree = await getTreeState(issuerId);
     
-    try {
-        await issuerTree.prepareClaimForInsert(claim);
+        await issuerTree.prepareClaimForInsert(claim[i]);
         const newClaim = new Claim({
             id: claimId,
-            hi: claim.hi().toString(),
-            hv: claim.hv().toString(),
+            hi: claim[i].hi().toString(),
+            hv: claim[i].hv().toString(),
             schemaHash: schemaHash,
-            expiration: Number(claim.getExpirationDate()),
-            updatable: claim.getFlagUpdatable(),
+            expiration: Number(claim[i].getExpirationDate()),
+            updatable: claim[i].getFlagUpdatable(),
             version: versionClaim,
-            revNonce: Number(claim.getRevocationNonce()),
+            revNonce: Number(claim[i].getRevocationNonce()),
             createAt: Number(Date.now()),
             status: ClaimStatus.PENDING,
             userId: userId,
             proofType: ProofType.MTP,
             issuerId: issuerId,
-            schemaRegistryId: schemaRegistryId
+            schemaRegistryId: schemaRegistryId,
+            claimIndex: i
         });
         await newClaim.save();
         await saveTreeState(issuerTree);
-        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
-        return claimId;
-    } catch (err: any) {
-        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
-        throw(err);
     }
+    return {claim, claimId};
 }
 
 export async function getClaimByClaimId(claimId: string) {
-    const claim = await Claim.findOne({id: claimId});
-    if (!claim) {
+    const claim = await Claim.find({id: claimId});
+    if (claim.length == 0) {
         throw("ClaimId not exist!");
     }
 
-    return {
-        claimId: claimId,
-        hi: claim.hi!,
-        hv: claim.hv!,
-        schemaHash: claim.schemaHash!,
-        expiration: claim.expiration,
-        updatable: claim.updatable,
-        version: claim.version!,
-        revNonce: claim.revNonce!,
-        status: claim.status!,
-        userId: claim.userId!,
-        proofType: claim.proofType,
-        issuerId: claim.issuerId!,
-        schemaRegistryId: claim.schemaRegistryId
-
+    const claimsResponse = [];
+    for (let i = 0; i < claim.length; i++) {
+        claimsResponse.push({
+            claimId: claimId,
+            hi: claim[i].hi!,
+            hv: claim[i].hv!,
+            schemaHash: claim[i].schemaHash!,
+            expiration: claim[i].expiration,
+            updatable: claim[i].updatable,
+            version: claim[i].version!,
+            revNonce: claim[i].revNonce!,
+            status: claim[i].status!,
+            userId: claim[i].userId!,
+            proofType: claim[i].proofType,
+            issuerId: claim[i].issuerId!,
+            schemaRegistryId: claim[i].schemaRegistryId,
+            claimIndex: claim[i].claimIndex ?? 0
+        })
     }
+
+    return claimsResponse;
 }
 
-export async function getQueryMTPInput(issuerId: string, hi: string) {
+export async function getQueryMTPInput(issuerId: string, hi: Array< {claimIndex: number, hi: string} >) {
     const issuerTree = await getTreeState(issuerId);
     try {
-        const kycQueryMTPInput = await zidenjsWitness.queryMTP.kycGenerateQueryMTPInput(
-            GlobalVariables.F.e(hi),
-            issuerTree
-        );
-        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
-        return {
-            kycQueryMTPInput: JSON.parse(serializaData(kycQueryMTPInput))
+        let kycQueryMTPInput = [];
+        for (let i = 0; i < hi.length; i++) {
+            const input = await zidenjsWitness.queryMTP.kycGenerateQueryMTPInput(
+                GlobalVariables.F.e(hi[i].hi),
+                issuerTree
+            );
+            kycQueryMTPInput.push({
+                claimIndex: hi[i].claimIndex,
+                kycQueryMTPInput: JSON.parse(serializaData(input))
+            })
         }
+        
+        return kycQueryMTPInput;
     } catch (err: any) {
-        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
 }
 
-export async function getNonRevQueryMTPInput(issuerId: string, revNonce: number) {
+export async function getNonRevQueryMTPInput(issuerId: string, revNonce: Array<{claimIndex: number, revNonce: number}>) {
     const issuerTree = await getTreeState(issuerId);
     try {
-        const kycNonRevQueryMTPInput = await zidenjsWitness.queryMTP.kycGenerateNonRevQueryMTPInput(
-            BigInt(revNonce),
-            issuerTree
-        );
-        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
-        return {
-            kycQueryMTPInput: JSON.parse(serializaData(kycNonRevQueryMTPInput))
+        let kycNonRevQueryMTPInput = [];
+        for (let i = 0; i <revNonce.length; i++) {
+            const input = await zidenjsWitness.queryMTP.kycGenerateNonRevQueryMTPInput(
+                BigInt(revNonce[i].revNonce),
+                issuerTree
+            );
+            kycNonRevQueryMTPInput.push({
+                claimIndex: revNonce[i].claimIndex,
+                kycNonRevQueryMTPInput: JSON.parse(serializaData(input))
+            })
         }
+        // await closeLevelDb(claimsDb, revocationDb, rootsDb);
+        
+        return kycNonRevQueryMTPInput;
     } catch (err: any) {
         // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
@@ -155,7 +167,8 @@ export async function queryClaim( issuerId: string, status: Array<string>, holde
             issuerId: claims[i].issuerId,
             schemaHash: claims[i].schemaHash,
             createAt: claims[i].createAt,
-            revNonce: claims[i].revNonce
+            revNonce: claims[i].revNonce,
+            claimIndex: claims[i].claimIndex ?? 0
         });
     }
 
@@ -185,10 +198,15 @@ export async function setRevokeClaim(revNonces: Array<number>, issuerId: string)
     return idClaims;
 }
 
-export async function encodeClaim(claim: zidenjsClaim.entry.Entry, rawData: any, clientPubkey: string) {
+export async function encodeClaim(claim: Array<zidenjsClaim.entry.Entry>, rawData: any, clientPubkey: string) {
+    let claimSerializa = [];
+    for (let i = 0; i < claim.length; i++) {
+        claimSerializa.push(serializaDataClaim(claim[i]));
+    }
+    
     let data = serializaData({
         rawData: rawData,
-        claim: serializaDataClaim(claim)
+        claim: claimSerializa
     });
     
     await libsodium.ready;
@@ -216,11 +234,15 @@ export async function encodeClaim(claim: zidenjsClaim.entry.Entry, rawData: any,
     }
 }
 
-export async function saveEntryData(claimdId: string, claim: zidenjsClaim.entry.Entry, rawData: Object) {
+export async function saveEntryData(claimdId: string, claim: Array<zidenjsClaim.entry.Entry>, rawData: Object) {
+    const entry = [];
+    for (let i = 0; i < claim.length; i++) {
+        entry.push(serializaDataClaim(claim[i]));
+    }
     const newRaw = new Entry({
         claimId: claimdId,
         rawData: serializaData(rawData).toString(),
-        entry: serializaDataClaim(claim)
+        entry: entry
     });
 
     await newRaw.save();

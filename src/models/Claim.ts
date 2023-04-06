@@ -14,7 +14,8 @@ const Claim = new mongoose.Schema({
     userId: String,
     proofType: String,
     issuerId: String,
-    schemaRegistryId: String
+    schemaRegistryId: String,
+    claimIndex: Number
 });
 
 export default mongoose.model("Claim", Claim);
