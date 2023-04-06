@@ -35,8 +35,9 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
     }
 
     const schema = await Schema.findOne({"@hash": schemaHash});
-    if (!schema) {
-        throw("schemaHash not exist!");
+    let schemaName = "";
+    if (schema) {
+        schemaName = schema["@name"];
     }
 
     const issuer = await Issuer.findOne({issuerId: issuerId});
@@ -45,8 +46,9 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
     }
     
     const networkSchema = await Network.findOne({networkId: networkId});
-    if (!networkSchema) {
-        throw("networkId not exist!");
+    let networkName = "";
+    if (networkSchema && networkSchema.name != undefined) {
+        networkName = networkSchema.name;
     }
 
     const newRegistry = new SchemaRegistry({
@@ -65,8 +67,8 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
     return {
         id: newRegistry.id,
         schema: {
-            name: schema["@name"],
-            hash: schema["@hash"]
+            name: schemaName,
+            hash: schemaHash
         },
         issuerId: issuerId,
         description: description,
@@ -75,8 +77,8 @@ export async function createNewRegistry(schemaHash: string, issuerId: string, de
         endpointUrl: endpointUrl,
         isActive: true,
         network: {
-            networkId: networkSchema.networkId,
-            name: networkSchema.name
+            networkId: networkId,
+            name: networkName
         }
     };
 }
