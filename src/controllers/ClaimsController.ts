@@ -66,16 +66,6 @@ export class ClaimsController {
                 throw("Invalid type");
             }
 
-            const checkAuthenClaim = await checkAuthenClaimExist(id);
-            const checkClaim = await Claim.findOne({id: id});
-            if (checkAuthenClaim || !checkClaim) {
-                const response = await getAuthenProof(id, type);
-                res.status(200).send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message)
-                );
-                return;
-            }
-
             const claim = await getClaimByClaimId(id);
         
             if (claim[0].status != ClaimStatus.ACTIVE) {
@@ -235,17 +225,17 @@ export class ClaimsController {
                 throw("Invalid issuerId");
             }
 
-            const {revNonces} = req.body;
+            const {claimIds} = req.body;
 
-            if (revNonces == undefined || revNonces.length == 0) {
-                throw ("Required array revNonces to revoke");
+            if (claimIds == undefined || claimIds.length == 0) {
+                throw ("Required array claimIds to revoke");
             }
-            revNonces.forEach((revNonce: any) => {
-                if (typeof revNonce != "number") {
+            claimIds.forEach((claimId: any) => {
+                if (typeof claimId != "string") {
                     throw("revNonces must be array number");
                 }
             });
-            const claims = await setRevokeClaim(revNonces, issuerId);
+            const claims = await setRevokeClaim(claimIds, issuerId);
             res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             console.log(err);

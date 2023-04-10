@@ -136,6 +136,62 @@
         }
       }
     },
+    "/api/v1/auth/proof/{claimId}": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Generate proof input for auth claim",
+        "description": "Generate proof input for auth claim",
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type in (mtp, nonRevMtp)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "mtp",
+              "enum": [
+                "mtp",
+                "nonRevMtp"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/issuers": {
       "get": {
         "tags": [
@@ -1890,13 +1946,11 @@
       "RevokeList": {
         "type": "object",
         "properties": {
-          "revNonces": {
+          "claimIds": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "example": [10, 11, 12]
+              "type": "string"
+            }
           }
         }
       },

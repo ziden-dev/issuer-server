@@ -5,7 +5,9 @@ import path from 'path'
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getAuthenIssuerId } from "../services/Issuer.js";
-import { login, verfifyTokenWithRole, verifyTokenAdmin } from "../services/Authen.js";
+import { getAuthenProof, login, verfifyTokenWithRole, verifyTokenAdmin } from "../services/Authen.js";
+import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
+import { ProofTypeQuery } from "../common/enum/EnumType.js";
 
 let vk = JSON.parse(fs.readFileSync(path.resolve("./build/authen/verification_key.json"), 'utf-8'));
 enum Role {
@@ -110,6 +112,28 @@ export class AuthenController {
         buildResponse(ResultMessage.APISUCCESS.apiCode, {isValid: false}, ResultMessage.APISUCCESS.message)
       );      
       return;
+    }
+  }
+  
+  public async generateProofInput(req: Request, res: Response) {
+    try {
+      const claimId = req.params["claimId"];
+      const type = req.query["type"];
+
+      if (!claimId) {
+        throw ("Invalid claimId");
+      }
+
+      if (type != ProofTypeQuery.MTP && type != ProofTypeQuery.NON_REV_MTP) {
+        throw ("Invalid type");
+      }
+
+      const response = await getAuthenProof(claimId, type);
+      res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
+
+    } catch(err: any) {
+      console.log(err);
+      res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
     }
   }
 }

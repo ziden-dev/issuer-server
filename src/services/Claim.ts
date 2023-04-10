@@ -183,8 +183,8 @@ export async function getClaimStatus(claimId: string) {
     return claims.status;
 }
 
-export async function setRevokeClaim(revNonces: Array<number>, issuerId: string) {
-    const claims = await Claim.find({revNonce: {$in: revNonces}, status: ClaimStatus.ACTIVE, issuerId: issuerId});
+export async function setRevokeClaim(claimIds: Array<string>, issuerId: string) {
+    const claims = await Claim.find({id: {$in: claimIds}, status: ClaimStatus.ACTIVE, issuerId: issuerId});
     const idClaims: Array<any> = [];
     for (let i = 0; i < claims.length; i++) {
         claims[i].status = ClaimStatus.PENDING_REVOKE;
