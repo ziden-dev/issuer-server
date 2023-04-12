@@ -9,6 +9,7 @@ import { checkOperatorExisted, saveNewOperator } from "./Operator.js";
 import { GlobalVariables } from "../common/config/global.js";
 import { registerNewIssuer } from "./Authen.js";
 import AuthenClaim from "../models/AuthenClaim.js";
+import { serializaData } from "../util/utils.js";
 
 export async function saveTreeState(issuerTree: zidenjsTrees.Trees) {
     const issuerId = zidenjsUtils.bufferToHex(issuerTree.userID);
@@ -176,4 +177,17 @@ export async function restoreLastStateTransition(issuerId: string) {
     
     treeState.rootsVersion = treeState.lastestRootsVersion;
     await treeState.save();
+}
+
+export async function getLastestAuthClaimPath(issuerId: string) {
+    const issuer = await getIssuer(issuerId);
+    const issuerTree = await getTreeState(issuerId);
+    const authClaim = await zidenjsClaim.authClaim.newAuthClaimFromPublicKey(BigInt(issuer.pubkeyX!), BigInt(issuer.pubkeyY!));
+
+    const authClaimProof = await issuerTree.generateProofForClaim(
+        authClaim.hiRaw(),
+        authClaim.getRevocationNonce()
+    );
+
+    return JSON.parse(serializaData(authClaimProof));
 }

@@ -5,7 +5,7 @@ import Claim from "../models/Claim.js";
 import { getPublishAndRevkeChallenge, getPublishChallenge, getRevokeChallenge } from "./Challenge.js";
 import { getIssuer } from "./Issuer.js";
 import { backupLastState, cloneDb, closeLevelDb, restoreDb } from "./LevelDbManager.js";
-import { checkLockTreeState, getTreeState, saveTreeState, saveLastStateTransistion } from "./TreeState.js";
+import { checkLockTreeState, getTreeState, saveTreeState, saveLastStateTransistion, getLastestAuthClaimPath } from "./TreeState.js";
 import fs from "fs-extra";
 import { execSync } from "child_process";
 import { ethers } from "ethers"
@@ -173,6 +173,8 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
             await saveLastStateTransistion(issuerId);
             await backupLastState(issuer.pathDb!);
             // await closeLevelDb(claimsDb, revocationDb, rootsDb);
+            // const authClaimPath = await getLastestAuthClaimPath(issuerId);
+            // backup authClaimPath
             return true;
         } else {
             await restoreDb(issuer.pathDb!);

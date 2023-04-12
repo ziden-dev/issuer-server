@@ -558,6 +558,53 @@
         }
       }
     },
+    "/api/v1/issuers/{issuerId}/auth-path": {
+      "get": {
+        "security": [
+          {
+            "Authorization": ["read", "write"]
+          }
+        ],
+        "tags": [
+          "issuers"
+        ],
+        "summary": "Get Issuer infor",
+        "description": "Get Issuer infor",
+        "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "issuerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/claims": {
       "get": {
         "tags": [
