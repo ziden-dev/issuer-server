@@ -176,8 +176,9 @@ export async function getOperatorInforInAuthen(operatorId: string, issuerId: str
     return {
         userId: response.data.userId,
         issuerId: response.data.adminId,
-        operator: response.data.operator,
+        role: response.data.role,
         claimId: response.data.claimId,
+        schemaHash: response.data.schemaHash,
         version: response.data.version,
         revNonce: response.data.revNonce
     };
