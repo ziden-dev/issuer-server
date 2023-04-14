@@ -43,14 +43,15 @@ export async function createNewSchema(schema: any) {
 }
 
 export async function checkValidFormSchema(schema: any) {
-    if (!schema || !schema["@name"] || !schema["@type"] || !schema["@context"]) {
+    if (!schema || !schema["@name"] || !schema["@type"] || !schema["@context"] || !schema["@required"]) {
         throw("Invalid schema");
     }
 
     if (typeof schema["@name"] != "string" 
         || typeof schema["@type"] != "string"
         || typeof schema["@name"] != "string"
-        || !Array.isArray(schema["@context"])) {
+        || !Array.isArray(schema["@context"])
+        || !Array.isArray(schema["@required"])) {
             throw("Invalid schema");
         }
     if (!checkInEnum(schema["@type"], SchemaType)) {
