@@ -769,7 +769,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/v1/{issuerId}/{claimId}/status": {
       "put": {
         "operationId": "claims-14",
         "tags": [
@@ -787,6 +789,16 @@
             "name": "claimId",
             "in": "path",
             "description": "Id of claim",
+            "schema": {
+              "type": "string",
+              "example": "id123"
+            },
+            "required": true
+          },
+          {
+            "name": "issuerID",
+            "in": "path",
+            "description": "DID of issuer",
             "schema": {
               "type": "string",
               "example": "id123"
