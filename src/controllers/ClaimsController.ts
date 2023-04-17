@@ -444,4 +444,27 @@ export class ClaimsController {
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }
     }
+
+    public async updateReviewingClaim(req: Request, res: Response) {
+        try {
+            const {claimId} = req.params;
+            if (!claimId || typeof claimId != "string") {
+                throw("Invalid claimId");
+            }
+            const claim = await Claim.find({"id": claimId, "status": ClaimStatus.REVIEWING});
+            if (claim.length == 0) {
+                throw("Claim not REVIEWING");
+            }
+            for (let i = 0; i < claim.length; i++) {
+                claim[i].status = ClaimStatus.PENDING;
+                await claim[i].save();
+            }
+            res.send(
+                buildResponse(ResultMessage.APISUCCESS.apiCode, {claimId: claimId, status: ClaimStatus.PENDING}, ResultMessage.APISUCCESS.message)
+            );        
+        } catch (err: any) {
+            console.log(err);
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+        }
+    }
 }

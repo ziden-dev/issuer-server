@@ -41,6 +41,10 @@ export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: str
     const issuerTree = await getTreeState(issuerId);
     
     try {
+        let claimStatus = ClaimStatus.PENDING;
+        if (schemaHash == '21189809373272350628755683009063270') {
+            claimStatus = ClaimStatus.REVIEWING;
+        }
         await issuerTree.prepareClaimForInsert(claim);
         const newClaim = new Claim({
             id: claimId,
@@ -52,7 +56,7 @@ export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: str
             version: versionClaim,
             revNonce: Number(claim.getRevocationNonce()),
             createAt: Number(Date.now()),
-            status: ClaimStatus.PENDING,
+            status: claimStatus,
             userId: userId,
             proofType: ProofType.MTP,
             issuerId: issuerId,
