@@ -1257,7 +1257,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/v1/claims/{issuerId}/{claimId}/status": {
       "put": {
         "operationId": "claims-14",
         "tags": [
@@ -1271,6 +1273,16 @@
         "summary": "Update Reviewing Claim",
         "description": "Update Reviewing claim to Pending",
         "parameters": [
+          {
+            "name": "issuerId",
+            "in": "path",
+            "description": "DID of Issuer",
+            "schema": {
+              "type": "string",
+              "example": "id123"
+            },
+            "required": true
+          },
           {
             "name": "claimId",
             "in": "path",
