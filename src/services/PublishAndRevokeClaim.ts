@@ -132,10 +132,10 @@ export async function stateTransition(issuerId: string, signature:  zidenjsClaim
         const rapidSnarkPath = "build/rapidSnark"
         const rand = Date.now().toString() + (Math.floor(Math.random() * 1000)).toString();
         fs.writeFileSync(`${statePath}/${rand}input.json`, (serializaData(stateTransitionInputs)));
-        // execSync(`npx snarkjs calculatewitness ${statePath}/stateTransition.wasm ${statePath}/input.json ${statePath}/witness.wtns`)
-        // execSync(`npx snarkjs groth16 prove ${statePath}/state_final.zkey ${statePath}/witness.wtns ${statePath}/proof.json ${statePath}/public.json`)
-        execSync(`${statePath}/stateTransition ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`);
-        execSync(`${rapidSnarkPath}/prover ${statePath}/state_final.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
+        execSync(`npx snarkjs calculatewitness ${statePath}/stateTransition.wasm ${statePath}/input.json ${statePath}/witness.wtns`)
+        execSync(`npx snarkjs groth16 prove ${statePath}/state_final.zkey ${statePath}/witness.wtns ${statePath}/proof.json ${statePath}/public.json`)
+        // execSync(`${statePath}/stateTransition ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`);
+        // execSync(`${rapidSnarkPath}/prover ${statePath}/state_final.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
 
         // Prepare calldata for transitState 
         const out = execSync(`snarkjs zkey export soliditycalldata ${statePath}/${rand}public.json ${statePath}/${rand}proof.json`, { "encoding": "utf-8" }).toString().split(',').map(e => {

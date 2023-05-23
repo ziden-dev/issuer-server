@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  issuer-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/home/node/app/src
+      - ./logs:/home/node/app/logs
+      - ./db:/home/node/app/db
+      - ./build:/home/node/app/build
+    container_name: issuer-server
+    depends_on:
+      - issuer-db
+    expose:
+      - ${PORT}
+    ports:
+      - ${PORT}:${PORT}
+    command: npm run start
+  issuer-db:
+    image: mongo
+    volumes:
+      - mongodb-issuer:/data/db
+volumes:
+  mongodb-issuer:
