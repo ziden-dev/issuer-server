@@ -12,6 +12,9 @@ services:
       - ./db:/home/node/app/db
       - ./build:/home/node/app/build
     container_name: issuer-server
+    networks:
+      - ziden
+      - default
     depends_on:
       - issuer-db
     expose:
@@ -23,5 +26,12 @@ services:
     image: mongo
     volumes:
       - mongodb-issuer:/data/db
+    networks:
+      - default
 volumes:
   mongodb-issuer:
+networks:
+  ziden:
+    external: true
+    name: ziden
+  default:
