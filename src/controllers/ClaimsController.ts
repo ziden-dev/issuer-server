@@ -5,13 +5,10 @@ import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getChallengePublishAllClaims, getChallengeRevokeAllPendingRevoke, getCombinesChallenge as getCombineChallenge } from "../services/Challenge.js";
 import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.js";
 import { serializaData } from "../util/utils.js";
-import { claim as zidenjsClaim } from "zidenjs";
+import { SignedChallenge, claim as zidenjsClaim } from "zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
 import { createClaim, encodeClaim, getClaimByClaimId, getClaimStatus, getEntryData, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, saveClaim, saveEntryData, setRevokeClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
-import Schema from "../models/Schema.js";
-import { createNewSchema } from "../services/Schema.js";
-import { checkAuthenClaimExist, getAuthenProof } from "../services/Authen.js";
 import Claim from "../models/Claim.js";
 
 export class ClaimsController {
@@ -64,16 +61,6 @@ export class ClaimsController {
 
             if (type != ProofTypeQuery.MTP && type != ProofTypeQuery.NON_REV_MTP) {
                 throw("Invalid type");
-            }
-
-            const checkAuthenClaim = await checkAuthenClaimExist(id);
-            const checkClaim = await Claim.findOne({id: id});
-            if (checkAuthenClaim || !checkClaim) {
-                const response = await getAuthenProof(id, type);
-                res.status(200).send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message)
-                );
-                return;
             }
 
             const claim = await getClaimByClaimId(id);
@@ -334,7 +321,7 @@ export class ClaimsController {
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
                 throw("Invalid signature");
             }
-            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+            const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
                 challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
                 challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
@@ -374,7 +361,7 @@ export class ClaimsController {
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
                 throw("Invalid signature");
             }
-            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+            const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
                 challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
                 challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
@@ -415,7 +402,7 @@ export class ClaimsController {
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
                 throw("Invalid signature");
             }
-            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+            const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
                 challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
                 challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),

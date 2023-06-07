@@ -1,10 +1,8 @@
 import { Router } from "express";
-import { AuthenController } from "../controllers/AuthenController.js";
 import { SchemasController } from "../controllers/SchemasController.js";
 
 export class SchemasRouter {
     public router: Router;
-    public authenController = new AuthenController();
     public schemaController = new SchemasController();
     constructor () {
         this.router = Router();

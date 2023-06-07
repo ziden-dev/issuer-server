@@ -11,7 +11,6 @@ import * as swaggerUi from "swagger-ui-express";
 import { readFileSync } from 'fs';
 import logger from './lib/logger/index.js';
 import morgan from 'morgan';
-import { AthenRoutes } from './routers/authenRoutes.js';
 import { IssuerRooutes } from './routers/issuersRoutes.js';
 import { ClaimsRouters } from './routers/claimsRoutes.js';
 import { SchemasRouter } from './routers/schemasRoutes.js';
@@ -35,7 +34,6 @@ class Server {
   }
 
   public routes(): void {
-    this.app.use("/api/v1/auth", new AthenRoutes().router);
     this.app.use("/api/v1/issuers", new IssuerRooutes().router);
     this.app.use("/api/v1/claims", new ClaimsRouters().router);
     this.app.use("/api/v1/schemas", new SchemasRouter().router);

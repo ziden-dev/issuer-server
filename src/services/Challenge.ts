@@ -3,7 +3,7 @@ import { GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
 import { getIssuer } from "./Issuer.js";
-import { cloneDb, closeLevelDb, restoreDb } from "./LevelDbManager.js";
+import { cloneDb, restoreDb } from "./LevelDbManager.js";
 import { getTreeState } from "./TreeState.js";
 
 export async function getPublishChallenge(claimIds: Array<string>, issuerId: string): Promise<BigInt> {
@@ -80,7 +80,7 @@ export async function getRevokeChallenge(claimIds: Array<string>, issuerId: stri
 }
 
 
-export async function getPublishAndRevkeChallenge(claimIdsPublish: Array<string>, claimIdsRevoke: Array<string>, issuerId: string): Promise<BigInt> {
+export async function getPublishAndRevokeChallenge(claimIdsPublish: Array<string>, claimIdsRevoke: Array<string>, issuerId: string): Promise<BigInt> {
 
     const claimsPublish = await Claim.find({"id": {$in: claimIdsPublish}, "status": ClaimStatus.PENDING, "issuerId": issuerId});
 
@@ -151,6 +151,6 @@ export async function getCombinesChallenge(issuerId: string) {
     const claimIdsRevoke: Array<string> = claimsRevoke.map(claim => {
         return claim.id!;
     });
-    const challenge = await getPublishAndRevkeChallenge(claimIdsPublish, claimIdsRevoke, issuerId);
+    const challenge = await getPublishAndRevokeChallenge(claimIdsPublish, claimIdsRevoke, issuerId);
     return challenge;
 }

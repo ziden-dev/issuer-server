@@ -1,10 +1,8 @@
 import { Router } from "express";
-import { AuthenController } from "../controllers/AuthenController.js";
 import { NetworkController } from "../controllers/NetworkController.js";
 
 export class NetWorkRoutes {
     public router: Router;
-    public authenController = new AuthenController();
     public networksController = new NetworkController();
     constructor() {
         this.router = Router();

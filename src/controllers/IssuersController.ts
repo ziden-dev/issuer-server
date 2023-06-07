@@ -3,8 +3,7 @@ import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.j
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getAllIssuer, getIssuerInfor } from "../services/Issuer.js";
-import { createNewOperator, disableOperator, getListOperator, getOperatorInfor } from "../services/Operator.js";
-import { checkLockTreeState, registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
+import { registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
 
 export class IssuerController {
     public async registerIssuer(req: Request, res: Response) {
@@ -31,91 +30,6 @@ export class IssuerController {
 
             await restoreLastStateTransition(issuerId);
             res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
-
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async addNewOperator(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("IssuerId invalid!");
-            }
-
-            const {operatorId} = req.body;
-            if (!operatorId || typeof operatorId != "string") {
-                throw("OperatorId invalid!");
-            }
-
-            let token = req.headers.authorization;
-            if (!token || typeof token != "string") {
-                throw("Invalid token");
-            }
-
-            const response = await createNewOperator(operatorId, issuerId, token);
-            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async deleteOperator(req: Request, res: Response) {
-        try {
-            const {issuerId, operatorId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("IssuerId invalid!");
-            }
-
-            if (!operatorId || typeof operatorId != "string") {
-                throw("OperatorId invalid!");
-            }
-
-            let token = req.headers.authorization;
-            if (!token || typeof token != "string") {
-                throw("Invalid token");
-            }
-
-            await disableOperator(operatorId, issuerId);
-            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async getOperatorInfor(req: Request, res: Response) {
-        try {
-            const {issuerId, operatorId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("IssuerId invalid!");
-            }
-
-            if (!operatorId || typeof operatorId != "string") {
-                throw("OperatorId invalid!");
-            }
-
-            const operator = await getOperatorInfor(operatorId, issuerId);
-            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, operator, ResultMessage.APISUCCESS.message));
-        
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async getListOperator(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("IssuerId invalid!");
-            }
-
-            const operators = await getListOperator(issuerId);
-            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, operators, ResultMessage.APISUCCESS.message));
 
         } catch (err: any) {
             console.log(err);

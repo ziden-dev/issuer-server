@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const TreeState = new mongoose.Schema({
-    rootsVersion: Number,
     revocationNonce: Number,
+    authRevNonce: Number,
     userID: String,
-    lastestRootsVersion: Number,
     lastestRevocationNonce: Number,
+    lastestAuthRevNonce: Number,
     isLockPublish: Boolean
 });
 

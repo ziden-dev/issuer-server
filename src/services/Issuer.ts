@@ -27,7 +27,8 @@ export async function getIssuer(issuerId: string) {
             issuerId: issuer.issuerId,
             pubkeyX: issuer.pubkeyX,
             pubkeyY: issuer.pubkeyY,
-            pathDb: issuer.pathDb
+            pathDb: issuer.pathDb,
+            authHi: issuer.authHi
         }
     }
 }
