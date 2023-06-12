@@ -1,10 +1,10 @@
-import { levelDbSrc, levelDbSrcClone } from "../common/config/constant.js";
 import { GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
 import { getIssuer } from "./Issuer.js";
 import { cloneDb, closeLevelDb, restoreDb } from "./LevelDbManager.js";
 import { getTreeState } from "./TreeState.js";
+import { utils as zidenjsUtils } from "@zidendev/zidenjs";
 
 export async function getPublishChallenge(claimIds: Array<string>, issuerId: string): Promise<BigInt> {
 
@@ -22,12 +22,12 @@ export async function getPublishChallenge(claimIds: Array<string>, issuerId: str
             return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];
         });
     
-        const oldState = issuerTree.getIdenState();
+        const oldState = zidenjsUtils.bitsToNum(issuerTree.getIdenState());
     
         await issuerTree.batchInsertClaimByHiHv(hihv);
         await issuerTree.batchRevokeClaim([]);
     
-        const newState = issuerTree.getIdenState();
+        const newState = zidenjsUtils.bitsToNum(issuerTree.getIdenState());
         const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
     
         await restoreDb(issuer.pathDb!);
@@ -75,8 +75,6 @@ export async function getRevokeChallenge(claimIds: Array<string>, issuerId: stri
         // await closeLevelDb(claimsDb, revocationDb, rootsDb);
         throw(err);
     }
-    
-    
 }
 
 

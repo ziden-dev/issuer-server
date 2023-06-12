@@ -1,7 +1,7 @@
 import { dbPath, levelDbSrc, levelDbSrcClone, levelDbStateBackup } from "../common/config/constant.js";
 import fs from "fs-extra"
 
-import {db as zidenjsDb} from "zidenjs";
+import {db as zidenjsDb} from "@zidendev/zidenjs";
 import { GlobalVariables } from "../common/config/global.js";
 
 export async function createNewLevelDb(id: string) {
@@ -10,12 +10,12 @@ export async function createNewLevelDb(id: string) {
         fs.removeSync(pathLevelDb);
         if (GlobalVariables.levelDb[pathLevelDb] == undefined) {
             const claimsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/claims`);
-            const revocationDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/revocation`);
-            const rootsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/roots`);
+            const claimRevDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/claimRev`);
+            const authsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/auths`);
             GlobalVariables.levelDb[pathLevelDb] = {
                 "claimsDb": claimsDb,
-                "revocationDb": revocationDb,
-                "rootsDb": rootsDb
+                "claimRevDb": claimRevDb,
+                "authsDb": authsDb
             }
         }
         else {
@@ -23,13 +23,13 @@ export async function createNewLevelDb(id: string) {
                 const claimsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/claims`);
                 GlobalVariables.levelDb[pathLevelDb]["claimsDb"] = claimsDb;
             }
-            if (GlobalVariables.levelDb[pathLevelDb]["revocationDb"] == undefined) {
-                const revocationDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/revocation`);
-                GlobalVariables.levelDb[pathLevelDb]["revocationDb"] = revocationDb;
+            if (GlobalVariables.levelDb[pathLevelDb]["claimRevDb"] == undefined) {
+                const claimRevDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/claimRev`);
+                GlobalVariables.levelDb[pathLevelDb]["claimRevDb"] = claimRevDb;
             }
-            if (GlobalVariables.levelDb[pathLevelDb]["rootsDb"] == undefined) {
-                const rootsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/roots`);
-                GlobalVariables.levelDb[pathLevelDb]["rootsDb"] = rootsDb;
+            if (GlobalVariables.levelDb[pathLevelDb]["authsDb"] == undefined) {
+                const authsDb = new zidenjsDb.SMTLevelDb(pathLevelDb + `/${levelDbSrc}/auths`);
+                GlobalVariables.levelDb[pathLevelDb]["authsDb"] = authsDb;
             }
         }
     
@@ -44,7 +44,7 @@ export async function createNewLevelDb(id: string) {
     }
 }
 
-export async function closeLevelDb(claimsDb: zidenjsDb.SMTLevelDb, revocationDb: zidenjsDb.SMTLevelDb, rootsDb: zidenjsDb.SMTLevelDb) {
+export async function closeLevelDb(claimsDb: zidenjsDb.SMTLevelDb, claimRevDb: zidenjsDb.SMTLevelDb, authsDb: zidenjsDb.SMTLevelDb) {
     try {
         // await claimsDb.nodes.close();
         // await revocationDb.nodes.close();
@@ -60,12 +60,12 @@ export async function openLevelDb(src: string) {
 
     if (GlobalVariables.levelDb[src] == undefined) {
         const claimsDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/claims`);
-        const revocationDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/revocation`);
-        const rootsDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/roots`);
+        const claimRevDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/claimRev`);
+        const authsDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/auths`);
         GlobalVariables.levelDb[src] = {
             "claimsDb": claimsDb,
-            "revocationDb": revocationDb,
-            "rootsDb": rootsDb
+            "claimRevDb": claimRevDb,
+            "authsDb": authsDb
         }
     }
     else {
@@ -73,13 +73,13 @@ export async function openLevelDb(src: string) {
             const claimsDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/claims`);
             GlobalVariables.levelDb[src]["claimsDb"] = claimsDb;
         }
-        if (GlobalVariables.levelDb[src]["revocationDb"] == undefined) {
-            const revocationDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/revocation`);
-            GlobalVariables.levelDb[src]["revocationDb"] = revocationDb;
+        if (GlobalVariables.levelDb[src]["claimRevDb"] == undefined) {
+            const claimRevDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/claimRev`);
+            GlobalVariables.levelDb[src]["claimRevDb"] = claimRevDb;
         }
-        if (GlobalVariables.levelDb[src]["rootsDb"] == undefined) {
-            const rootsDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/roots`);
-            GlobalVariables.levelDb[src]["rootsDb"] = rootsDb;
+        if (GlobalVariables.levelDb[src]["authsDb"] == undefined) {
+            const authsDb = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/auths`);
+            GlobalVariables.levelDb[src]["authsDb"] = authsDb;
         }
     }
 
@@ -126,12 +126,12 @@ export async function close_db(src: string) {
         console.log(err)
     }
     try {
-        await GlobalVariables.levelDb[src].revocationDb.nodes.close();
+        await GlobalVariables.levelDb[src].claimRevDb.nodes.close();
     } catch(err) {
         console.log(err)
     }
     try {
-        await GlobalVariables.levelDb[src].rootsDb.nodes.close();
+        await GlobalVariables.levelDb[src].authsDb.nodes.close();
     } catch(err) {
         console.log(err)
     }
@@ -139,21 +139,21 @@ export async function close_db(src: string) {
 
 export async function open_db(src: string) {
     GlobalVariables.levelDb[src]["claimsDb"] = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/claims`);
-    GlobalVariables.levelDb[src]["revocationDb"] = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/revocation`);
-    GlobalVariables.levelDb[src]["rootsDb"] = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/roots`);
+    GlobalVariables.levelDb[src]["claimRevDb"] = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/claimRev`);
+    GlobalVariables.levelDb[src]["authsDb"] = new zidenjsDb.SMTLevelDb(src + `/${levelDbSrc}/auths`);
     try {
         await GlobalVariables.levelDb[src].claimsDb.nodes.open();
     } catch (err: any) {
         console.log("claims");
     }
     try {
-        await GlobalVariables.levelDb[src].revocationDb.nodes.open();
+        await GlobalVariables.levelDb[src].claimRevDb.nodes.open();
     } catch (err: any) {
-        console.log("revocation");
+        console.log("claimRev");
     }
     try {
-        await GlobalVariables.levelDb[src].rootsDb.nodes.open();
+        await GlobalVariables.levelDb[src].authsDb.nodes.open();
     } catch (err: any) {
-        console.log("roots");
+        console.log("auths");
     }
 }

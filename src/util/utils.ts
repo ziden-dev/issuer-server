@@ -1,4 +1,4 @@
-import { utils as zidenjsUtils, claim as zidenjsClaim, claim } from "zidenjs";
+import { utils as zidenjsUtils, claim as zidenjsClaim, claim } from "@zidendev/zidenjs";
 import fs, { readFileSync } from "fs";
 import { GlobalVariables } from "../common/config/global.js";
 
@@ -10,7 +10,7 @@ export function serializaData(data: Object): string {
     );
 }
 
-export function serializaDataClaim(claim: zidenjsClaim.entry.Entry): Array<string> {
+export function serializaDataClaim(claim: zidenjsClaim.Entry): Array<string> {
     let dataResponse = new Array<string>;
     claim.elements.forEach(function (value: Buffer) {
         dataResponse.push(zidenjsUtils.bufferToHex(value));
@@ -19,12 +19,12 @@ export function serializaDataClaim(claim: zidenjsClaim.entry.Entry): Array<strin
     return dataResponse;
 }
 
-export function deserializaDataClaim(claim: Array<string>): zidenjsClaim.entry.Entry {
+export function deserializaDataClaim(claim: Array<string>): zidenjsClaim.Entry {
     let data = new Array<Buffer>;
     claim.forEach(function (value: string) {
         data.push(zidenjsUtils.hexToBuffer(value, 32));
     });
-    return new zidenjsClaim.entry.Entry(data);
+    return new zidenjsClaim.Entry(data);
 }
 
 export function uint8ArrayToArray(uint8Array: Uint8Array) {

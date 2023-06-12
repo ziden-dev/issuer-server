@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { claim as zidenjsClaim, witness as zidenjsWitness, schema as zidenjsSchema } from "zidenjs";
+import { claim as zidenjsClaim, queryMTP, schema as zidenjsSchema } from "@zidendev/zidenjs";
 import { GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus, ProofType } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
@@ -30,7 +30,7 @@ export async function createClaim(data: any, holderId: string, registryId: strin
     return {claim: claim, schemaHash: schemaHash};
 }
 
-export async function saveClaim(claim: zidenjsClaim.entry.Entry, schemaHash: string, userId: string, issuerId: string, schemaRegistryId: string) {
+export async function saveClaim(claim: zidenjsClaim.Entry, schemaHash: string, userId: string, issuerId: string, schemaRegistryId: string) {
     const claimId = v4();
     const lastClaim = await Claim.find({userId: userId, schemaHash: schemaHash}).limit(1).sort({"version": -1});
     let versionClaim = 0;
@@ -99,7 +99,7 @@ export async function getClaimByClaimId(claimId: string) {
 export async function getQueryMTPInput(issuerId: string, hi: string) {
     const issuerTree = await getTreeState(issuerId);
     try {
-        const kycQueryMTPInput = await zidenjsWitness.queryMTP.kycGenerateQueryMTPInput(
+        const kycQueryMTPInput = await queryMTP.kycGenerateQueryMTPInput(
             GlobalVariables.F.e(hi),
             issuerTree
         );
@@ -116,7 +116,7 @@ export async function getQueryMTPInput(issuerId: string, hi: string) {
 export async function getNonRevQueryMTPInput(issuerId: string, revNonce: number) {
     const issuerTree = await getTreeState(issuerId);
     try {
-        const kycNonRevQueryMTPInput = await zidenjsWitness.queryMTP.kycGenerateNonRevQueryMTPInput(
+        const kycNonRevQueryMTPInput = await queryMTP.kycGenerateNonRevQueryMTPInput(
             BigInt(revNonce),
             issuerTree
         );
@@ -189,7 +189,7 @@ export async function setRevokeClaim(revNonces: Array<number>, issuerId: string)
     return idClaims;
 }
 
-export async function encodeClaim(claim: zidenjsClaim.entry.Entry, rawData: any, clientPubkey: string) {
+export async function encodeClaim(claim: zidenjsClaim.Entry, rawData: any, clientPubkey: string) {
     let data = serializaData({
         rawData: rawData,
         claim: serializaDataClaim(claim)
@@ -220,7 +220,7 @@ export async function encodeClaim(claim: zidenjsClaim.entry.Entry, rawData: any,
     }
 }
 
-export async function saveEntryData(claimdId: string, claim: zidenjsClaim.entry.Entry, rawData: Object) {
+export async function saveEntryData(claimdId: string, claim: zidenjsClaim.Entry, rawData: Object) {
     const newRaw = new Entry({
         claimId: claimdId,
         rawData: serializaData(rawData).toString(),
