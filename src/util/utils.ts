@@ -1,4 +1,4 @@
-import { utils as zidenjsUtils, claim as zidenjsClaim, claim } from "zidenjs";
+import { utils as zidenjsUtils, claim as zidenjsClaim, claim } from "@zidendev/zidenjs";
 import fs, { readFileSync } from "fs";
 import { GlobalVariables } from "../common/config/global.js";
 

@@ -4,7 +4,7 @@ import {
   state,
   smt,
   Auth,
-} from "zidenjs";
+} from "@zidendev/zidenjs";
 import Issuer from "../models/Issuer.js";
 import TreeState from "../models/TreeState.js";
 import { createNewLevelDb, openLevelDb, restoreDb } from "./LevelDbManager.js";

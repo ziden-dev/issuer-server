@@ -6,7 +6,7 @@ import {
   SnarkField,
   db,
   params as zidenjsParams,
-} from "zidenjs";
+} from "@zidendev/zidenjs";
 
 export class GlobalVariables {
   public static hasher: Hasher;

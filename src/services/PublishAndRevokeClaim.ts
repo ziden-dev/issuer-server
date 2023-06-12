@@ -2,7 +2,7 @@ import {
   Auth,
   SignedChallenge,
   stateTransition as zidenStateTransition,
-} from "zidenjs";
+} from "@zidendev/zidenjs";
 import { GlobalVariables as GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
@@ -199,7 +199,7 @@ export async function stateTransition(
       `${statePath}/stateTransition ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`
     );
     execSync(
-      `${rapidSnarkPath}/prover ${statePath}/state_final.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`
+      `${rapidSnarkPath}/prover ${statePath}/stateTransition.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`
     );
 
     // Prepare calldata for transitState

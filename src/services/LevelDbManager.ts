@@ -1,7 +1,7 @@
 import { dbPath, levelDbSrc, levelDbSrcClone, levelDbStateBackup } from "../common/config/constant.js";
 import fs from "fs-extra"
 
-import {db as zidenjsDb} from "zidenjs";
+import {db as zidenjsDb} from "@zidendev/zidenjs";
 import { GlobalVariables } from "../common/config/global.js";
 
 export async function createNewLevelDb(id: string) {

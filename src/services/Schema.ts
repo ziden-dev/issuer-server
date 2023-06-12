@@ -3,7 +3,7 @@ import { v4 } from "uuid";
 import { SchemaPropertyId, SchemaPropertyType, SchemaType } from "../common/enum/EnumType.js";
 import Schema from "../models/Schema.js";
 import { checkInEnum, getSchemaHashFromSchema } from "../util/utils.js";
-import { schema as zidenjsSchema } from "zidenjs";
+import { schema as zidenjsSchema } from "@zidendev/zidenjs";
 
 export async function createNewSchema(schema: any) {
     try {

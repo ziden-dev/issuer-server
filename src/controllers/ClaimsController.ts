@@ -5,7 +5,7 @@ import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getChallengePublishAllClaims, getChallengeRevokeAllPendingRevoke, getCombinesChallenge as getCombineChallenge } from "../services/Challenge.js";
 import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.js";
 import { serializaData } from "../util/utils.js";
-import { SignedChallenge, claim as zidenjsClaim } from "zidenjs";
+import { SignedChallenge, claim as zidenjsClaim } from "@zidendev/zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
 import { createClaim, encodeClaim, getClaimByClaimId, getClaimStatus, getEntryData, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, saveClaim, saveEntryData, setRevokeClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";

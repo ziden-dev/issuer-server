@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { queryMTP, claim as zidenjsClaim, schema as zidenjsSchema } from "zidenjs";
+import { queryMTP, claim as zidenjsClaim, schema as zidenjsSchema } from "@zidendev/zidenjs";
 import { GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus, ProofType } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
