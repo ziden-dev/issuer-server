@@ -1225,7 +1225,7 @@
         }
       }
     },
-    "/api/v1/claims/{issuerId}/{claimId}/status": {
+    "/api/v1/claims/{issuerId}/{claimId}/status/{status}": {
       "put": {
         "operationId": "claims-14",
         "tags": [
@@ -1256,6 +1256,19 @@
             "schema": {
               "type": "string",
               "example": "id123"
+            },
+            "required": true
+          },
+          {
+            "name": "status",
+            "in": "path",
+            "description": "Claim Status, must be PENDING or REJECT",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING", "REJECT"
+              ],
+              "default": "PENDING"
             },
             "required": true
           }

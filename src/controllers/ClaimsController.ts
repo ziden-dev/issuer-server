@@ -434,20 +434,23 @@ export class ClaimsController {
 
     public async updateReviewingClaim(req: Request, res: Response) {
         try {
-            const {claimId} = req.params;
+            const {claimId, status} = req.params;
             if (!claimId || typeof claimId != "string") {
                 throw("Invalid claimId");
+            }
+            if (status != ClaimStatus.PENDING && status != ClaimStatus.REJECT) {
+                throw("Status must PENDING or REJECT")
             }
             const claim = await Claim.find({"id": claimId, "status": ClaimStatus.REVIEWING});
             if (claim.length == 0) {
                 throw("Claim not REVIEWING");
             }
             for (let i = 0; i < claim.length; i++) {
-                claim[i].status = ClaimStatus.PENDING;
+                claim[i].status = status;
                 await claim[i].save();
             }
             res.send(
-                buildResponse(ResultMessage.APISUCCESS.apiCode, {claimId: claimId, status: ClaimStatus.PENDING}, ResultMessage.APISUCCESS.message)
+                buildResponse(ResultMessage.APISUCCESS.apiCode, {claimId: claimId, status: status}, ResultMessage.APISUCCESS.message)
             );        
         } catch (err: any) {
             console.log(err);
