@@ -92,7 +92,6 @@ export async function getClaimByClaimId(claimId: string) {
         proofType: claim.proofType,
         issuerId: claim.issuerId!,
         schemaRegistryId: claim.schemaRegistryId
-
     }
 }
 

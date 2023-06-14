@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { JWZ } from "../lib/jwz/jwz.js";
 import fs from 'fs'
 import path from 'path'
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
-import { getAuthenIssuerId } from "../services/Issuer.js";
 import { getAuthenProof, login, verfifyTokenWithRole, verifyTokenAdmin } from "../services/Authen.js";
 import { ProofTypeQuery } from "../common/enum/EnumType.js";
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
