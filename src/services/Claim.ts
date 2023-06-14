@@ -5,7 +5,6 @@ import { ClaimStatus, ProofType } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
 import SchemaRegistry from "../models/SchemaRegistry.js";
 import { serializaData, serializaDataClaim } from "../util/utils.js";
-import { closeLevelDb } from "./LevelDbManager.js";
 import { getRawSchema } from "./Schema.js";
 import { getTreeState, saveTreeState } from "./TreeState.js";
 import libsodium from "libsodium-wrappers";
