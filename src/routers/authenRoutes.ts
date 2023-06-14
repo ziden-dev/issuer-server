@@ -12,5 +12,6 @@ export class AthenRoutes {
     routers(): void {
         this.router.post("/login/:issuerId", this.authenController.authentication);
         this.router.post("/verify-token/:issuerId", this.authenController.verifyToken);
+        this.router.get("/proof/:claimId", this.authenController.generateProofInput);
     }
 }

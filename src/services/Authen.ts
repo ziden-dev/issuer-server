@@ -1,6 +1,5 @@
 import axios from "axios";
 import { AUTHEN_SERVER } from "../common/config/secrets.js";
-import AuthenClaim from "../models/AuthenClaim.js";
 
 export async function verifyTokenAdmin(token: string, issuerId: string) {
     try {
@@ -158,15 +157,6 @@ export async function getAuthenProof(claimId: string, type: string) {
     return proof.data;
 }
 
-export async function checkAuthenClaimExist(claimId: string) {
-    const authenClaim = await AuthenClaim.findOne({claimId: claimId});
-    if (authenClaim) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 export async function getOperatorInforInAuthen(operatorId: string, issuerId: string) {
     let url = AUTHEN_SERVER + `/api/v1/${issuerId}/operators/${operatorId}`;
     const response = await axios.request({
@@ -176,8 +166,9 @@ export async function getOperatorInforInAuthen(operatorId: string, issuerId: str
     return {
         userId: response.data.userId,
         issuerId: response.data.adminId,
-        operator: response.data.operator,
+        role: response.data.role,
         claimId: response.data.claimId,
+        schemaHash: response.data.schemaHash,
         version: response.data.version,
         revNonce: response.data.revNonce
     };

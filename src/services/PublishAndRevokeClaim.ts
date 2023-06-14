@@ -133,8 +133,6 @@ export async function stateTransition(issuerId: string, signature: SignedChallen
     const issuerTree = await getTreeState(issuerId);
     
     try {
-        console.log("----issuerId", zidenjsUtils.bufferToHex(issuerTree.userID));
-
         const stateTransitionInputs = await zidenStateTransition.stateTransitionWitnessWithSignatureAndHiHvs(
             signature,
             auth,

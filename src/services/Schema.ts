@@ -4,6 +4,7 @@ import { SchemaPropertyId, SchemaPropertyType, SchemaType } from "../common/enum
 import Schema from "../models/Schema.js";
 import { checkInEnum, getSchemaHashFromSchema } from "../util/utils.js";
 import { schema as zidenjsSchema } from "@zidendev/zidenjs";
+import { ZIDEN_SERVER_URI } from "../common/config/secrets.js";
 
 export async function createNewSchema(schema: any) {
     try {
@@ -25,6 +26,14 @@ export async function createNewSchema(schema: any) {
 
         newSchema["@id"] = v4();
 
+        await axios.request({
+            method: "POST",
+            url: `${ZIDEN_SERVER_URI}/api/v1/schemas/pull-request`,
+            data: {
+                schema: newSchema
+            }
+        });
+
         await newSchema.save();
         return newSchema;
     } catch (err: any) {
@@ -34,14 +43,15 @@ export async function createNewSchema(schema: any) {
 }
 
 export async function checkValidFormSchema(schema: any) {
-    if (!schema || !schema["@name"] || !schema["@type"] || !schema["@context"]) {
+    if (!schema || !schema["@name"] || !schema["@type"] || !schema["@context"] || !schema["@required"]) {
         throw("Invalid schema");
     }
 
     if (typeof schema["@name"] != "string" 
         || typeof schema["@type"] != "string"
         || typeof schema["@name"] != "string"
-        || !Array.isArray(schema["@context"])) {
+        || !Array.isArray(schema["@context"])
+        || !Array.isArray(schema["@required"])) {
             throw("Invalid schema");
         }
     if (!checkInEnum(schema["@type"], SchemaType)) {

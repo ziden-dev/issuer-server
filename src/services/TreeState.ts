@@ -1,14 +1,14 @@
-import {utils as zidenjsUtils, state, smt, Auth} from "@zidendev/zidenjs";
+import {utils as zidenjsUtils, state, smt, Auth, auth} from "@zidendev/zidenjs";
 import Issuer from "../models/Issuer.js";
 import TreeState from "../models/TreeState.js";
-import { createNewLevelDb, openLevelDb } from "./LevelDbManager.js";
+import { createNewLevelDb, openLevelDb, restoreDb } from "./LevelDbManager.js";
 import { v4 } from "uuid";
 import { OperatorType } from "../common/enum/EnumType.js";
 import { checkIssuerExisted, getIssuer, updateIssuer } from "./Issuer.js";
 import { checkOperatorExisted, saveNewOperator } from "./Operator.js";
 import { GlobalVariables } from "../common/config/global.js";
 import { registerNewIssuer } from "./Authen.js";
-import AuthenClaim from "../models/AuthenClaim.js";
+import { serializaData } from "../util/utils.js";
 
 export async function saveTreeState(issuerTree: state.State) {
     const issuerId = zidenjsUtils.bufferToHex(issuerTree.userID);
@@ -152,13 +152,6 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
             await saveNewOperator(issuerId, OperatorType.ADMIN, issuerRegisterResponse.claimId, issuerId);
         }
 
-        const newAuthenClaim = new AuthenClaim({
-            issuerId: issuerId,
-            userId: issuerId,
-            claimId: issuerRegisterResponse.claimId
-        });
-        await newAuthenClaim.save();
-
         return {
             issuerId: issuerId,
             claimId: issuerRegisterResponse.claimId,
@@ -177,10 +170,32 @@ export async function restoreLastStateTransition(issuerId: string) {
         throw("IssuerId not exist!");
     }
 
-    await restoreLastStateTransition(issuer.pathDb!);
+    await restoreDb(issuer.pathDb!);
     
     treeState.authRevNonce = treeState.lastestAuthRevNonce;
     // treeState.revocationNonce = treeState.lastestRevocationNonce;
 
     await treeState.save();
+}
+
+export async function getLastestAuthClaimPath(issuerId: string) {
+    const issuer = await getIssuer(issuerId);
+    const issuerTree = await getTreeState(issuerId);
+    const authClaim: Auth = {
+        authHi: BigInt(issuer.authHi!),
+        pubKey: {
+          X: BigInt(issuer.pubkeyX!),
+          Y: BigInt(issuer.pubkeyY!),
+        },
+    };
+
+    const authExistsProof = await issuerTree.generateAuthExistsProof(authClaim.authHi);
+    const rootsMatchProof = await issuerTree.generateRootsMatchProof();
+
+    const proof = {
+        ...authExistsProof,
+        ...rootsMatchProof
+    };
+
+    return JSON.parse(serializaData(proof));
 }

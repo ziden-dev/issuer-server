@@ -2,7 +2,6 @@ import Operator from "../models/Operator.js";
 import { OperatorType } from "../common/enum/EnumType.js";
 import { getClaimByClaimId, saveClaim } from "./Claim.js";
 import { createOperator, getOperatorInforInAuthen, revokeOperator } from "./Authen.js";
-import AuthenClaim from "../models/AuthenClaim.js";
 
 export async function saveNewOperator(userId: string, role: number, claimId: string, issuerId: string) {
     const isOperatorExisted = await checkOperatorExisted(userId, issuerId);
@@ -57,12 +56,6 @@ export async function checkOperatorExisted(userId: string, issuerId: string) {
 export async function createNewOperator(userId: string, issuerId: string, token: string) {
     const createOperatorRespone = await createOperator(userId, issuerId, token);
     await saveNewOperator(userId, OperatorType.OPERATOR, createOperatorRespone.claimId, issuerId);
-    const newAuthenClaim = new AuthenClaim({
-        issuerId: issuerId,
-        userId: userId,
-        claimId: createOperatorRespone.claimId
-    });
-    await newAuthenClaim.save();
 
     return createOperatorRespone;
 }
@@ -111,4 +104,15 @@ export async function getOperatorInfor(operatorId: string, issuerId: string) {
 export async function deleteOperator(userId: string, issuerId: string, token: string) {
     await disableOperator(userId, issuerId);
     await revokeOperator(userId, issuerId, token);
+}
+
+export async function getIssuerServerByOperator(userId: string) {
+    const operator = await Operator.find({userId: userId});
+    const issuerList: string[] = [];
+    for (let i = 0; i < operator.length; i++) {
+        const issuerId = operator[i].issuerId;
+        if (typeof issuerId == 'string' && !issuerList.includes(issuerId)) {
+            issuerList.push(issuerId);
+        }
+    }
 }

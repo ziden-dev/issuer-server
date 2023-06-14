@@ -18,6 +18,9 @@ const Schema = new mongoose.Schema({
     },
     "@context": {
         type: [String]
+    },
+    "@required": {
+        type: [String]
     }
 }, {
     strict: false

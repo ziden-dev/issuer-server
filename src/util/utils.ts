@@ -159,7 +159,7 @@ export function getSchemaHashFromSchema(schema: any) {
     let hashData = GlobalVariables
     .F.toObject(GlobalVariables.hasher([BigInt(zidenjsUtils.stringToHex(JSON.stringify(schema)))]))
     .toString(2);
-  let bitRemove = hashData.length < 128 ? 0 : hashData.length - 128;
+  let bitRemove = hashData.length < 124 ? 0 : hashData.length - 124;
   let hashDataFixed = BigInt('0b' + hashData.slice(0, hashData.length - bitRemove));
   let value = BigInt(hashDataFixed);
   return value.toString();
