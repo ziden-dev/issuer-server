@@ -151,6 +151,7 @@ export async function getSchemaBySchemaHash(schemaHash: string) {
         "@type": schema["@type"],
         "@id": schema["@id"],
         "@hash": schema["@hash"],
+        "@required": schema["@required"],
         ...schemaRaw
     };
 
