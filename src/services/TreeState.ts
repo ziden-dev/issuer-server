@@ -184,8 +184,6 @@ export async function getLastestAuthClaimPath(issuerId: string) {
 
     const rootsMatchProof = await issuerTree.generateRootsMatchProof();
 
-    console.log(zidenjsUtils.bufferToHex(issuerTree.getIdenState()))
-
     const proof = {
         claimsRoot: rootsMatchProof.claimsRoot,
         claimRevRoot: rootsMatchProof.claimRevRoot,

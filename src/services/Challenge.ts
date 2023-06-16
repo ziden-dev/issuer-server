@@ -59,12 +59,12 @@ export async function getRevokeChallenge(claimIds: Array<string>, issuerId: stri
             }
         });
     
-        const oldState = issuerTree.getIdenState();
+        const oldState = zidenjsUtils.bitsToNum(issuerTree.getIdenState());
     
         await issuerTree.batchInsertClaimByHiHv([]);
         await issuerTree.batchRevokeClaim(revNonces);
     
-        const newState = issuerTree.getIdenState();
+        const newState = zidenjsUtils.bitsToNum(issuerTree.getIdenState());
         const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
     
         await restoreDb(issuer.pathDb!);
@@ -104,12 +104,12 @@ export async function getPublishAndRevkeChallenge(claimIdsPublish: Array<string>
             return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];
         });
     
-        const oldState = issuerTree.getIdenState();
+        const oldState = zidenjsUtils.bitsToNum(issuerTree.getIdenState());
     
         await issuerTree.batchInsertClaimByHiHv(hihv);
         await issuerTree.batchRevokeClaim(revNonces);
     
-        const newState = issuerTree.getIdenState();
+        const newState = zidenjsUtils.bitsToNum(issuerTree.getIdenState());
         const challenge = GlobalVariables.F.toObject(GlobalVariables.hasher([oldState, newState]));
     
         await restoreDb(issuer.pathDb!);
