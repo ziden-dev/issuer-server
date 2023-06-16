@@ -181,20 +181,15 @@ export async function restoreLastStateTransition(issuerId: string) {
 export async function getLastestAuthClaimPath(issuerId: string) {
     const issuer = await getIssuer(issuerId);
     const issuerTree = await getTreeState(issuerId);
-    const authClaim: Auth = {
-        authHi: BigInt(issuer.authHi!),
-        pubKey: {
-          X: BigInt(issuer.pubkeyX!),
-          Y: BigInt(issuer.pubkeyY!),
-        },
-    };
 
-    const authExistsProof = await issuerTree.generateAuthExistsProof(authClaim.authHi);
     const rootsMatchProof = await issuerTree.generateRootsMatchProof();
 
+    console.log(zidenjsUtils.bufferToHex(issuerTree.getIdenState()))
+
     const proof = {
-        ...authExistsProof,
-        ...rootsMatchProof
+        claimsRoot: rootsMatchProof.claimsRoot,
+        claimRevRoot: rootsMatchProof.claimRevRoot,
+        expectedState: rootsMatchProof.expectedState
     };
 
     return JSON.parse(serializaData(proof));

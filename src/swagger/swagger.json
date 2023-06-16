@@ -786,13 +786,10 @@
         }
       }
     },
-    "/api/v1/issuers/{issuerId}/auth-path": {
+    "/api/v1/issuers/{issuerId}/lastest-state": {
       "get": {
         "operationId": "issuers-10",
         "security": [
-          {
-            "Authorization": ["read", "write"]
-          }
         ],
         "tags": [
           "issuers"
@@ -820,13 +817,6 @@
                   "description": "Issuer Auth Claim Path",
                   "type": "object",
                   "properties": {
-                    "authMTP": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "example": ["0", "0", "0"]
-                    },
                     "claimsRoot": {
                       "type": "string",
                       "example": "0"

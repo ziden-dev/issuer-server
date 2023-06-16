@@ -20,6 +20,6 @@ export class IssuerRooutes {
         this.router.get("/:issuerId/operators", this.issuerController.getListOperator);
         this.router.get("/:issuerId/profile", this.issuerController.getIssuerInfor);
         this.router.get("", this.issuerController.getAllIssuerId);
-        this.router.get("/:issuerId/auth-path", this.authenController.authorizationAdmin, this.issuerController.getAuthenPath);
+        this.router.get("/:issuerId/lastest-state", this.issuerController.getAuthenPath);
     }
 }
