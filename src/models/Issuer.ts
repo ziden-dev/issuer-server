@@ -5,7 +5,8 @@ const Issuer = new mongoose.Schema({
     authHi: String,
     pubkeyX: String,
     pubkeyY: String,
-    pathDb: String
+    pathDb: String,
+    privateKey: String
 });
 
 export default mongoose.model("Issuer", Issuer);

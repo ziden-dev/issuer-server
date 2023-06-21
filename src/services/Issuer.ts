@@ -1,9 +1,6 @@
-import { auth } from "@zidendev/zidenjs";
-import { PUBKEYX, PUBKEYY } from "../common/config/secrets.js";
 import { ClaimStatus } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
 import Issuer from "../models/Issuer.js";
-import Operator from "../models/Operator.js";
 
 export async function saveIssuer(issuerId: string, authHi: string, pubkeyX: string, pubkeyY: string, pathDb: string) {
     const checkIssuer = await Issuer.findOne({issuerId: issuerId});
@@ -31,12 +28,13 @@ export async function getIssuer(issuerId: string) {
             authHi: issuer.authHi,
             pubkeyX: issuer.pubkeyX,
             pubkeyY: issuer.pubkeyY,
-            pathDb: issuer.pathDb
+            pathDb: issuer.pathDb,
+            privateKey: issuer.privateKey
         }
     }
 }
 
-export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: string, pubkeyY: string, pathDb: string) {
+export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: string, pubkeyY: string, pathDb: string, privateKey: string) {
     const checkIssuer = await Issuer.findOne({issuerId: issuerId});
     if (!checkIssuer) {
         const issuer = new Issuer({
@@ -44,7 +42,8 @@ export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: s
             authHi: authHi,
             pubkeyX: pubkeyX,
             pubkeyY: pubkeyY,
-            pathDb: pathDb
+            pathDb: pathDb,
+            privateKey: privateKey
         });
         await issuer.save();
     } else {
@@ -73,11 +72,6 @@ export async function checkIssuerExisted(pubkeyX: string, pubkeyY: string) {
     }
 }
 
-export async function getAuthenIssuerId() {
-    const issuer = await Issuer.findOne({pubkeyX: PUBKEYX, pubkeyY: PUBKEYY});
-    return issuer?.issuerId;
-}
-
 export async function getIssuerInfor(issuerId: string) {
     const numPublishClaims = await Claim.countDocuments({"issuerId": issuerId, status: ClaimStatus.ACTIVE});
     const numHolders = (await Claim.aggregate([{"$match": {"issuerId": issuerId}}, {"$group": {_id: "$userId"}}])).length;
@@ -89,30 +83,12 @@ export async function getIssuerInfor(issuerId: string) {
     }
 }
 
-export async function getAllIssuer(operatorId: string) {
-    if (operatorId == '') {
-        const issuers = await Issuer.find();
-        let listIssuer: Array<any> = [];
-        for (let i = 0; i < issuers.length; i++) {
-            const ans = await getIssuerInfor(issuers[i].issuerId!);
-            listIssuer.push(ans);
-        }
-        return listIssuer;
-    } else {
-        const operators = await Operator.find({userId: operatorId});
-        const issuerIdList: string[] = [];
-        operators.forEach(operator => {
-            if (operator.issuerId != undefined) {
-                issuerIdList.push(operator.issuerId);
-            }
-        });
-
-        const issuers = await Issuer.find({'issuerId': {'$in': issuerIdList}});
-        let listIssuer: Array<any> = [];
-        for (let i = 0; i < issuers.length; i++) {
-            const ans = await getIssuerInfor(issuers[i].issuerId!);
-            listIssuer.push(ans);
-        }
-        return listIssuer;
-    }    
+export async function getAllIssuer() {
+    const issuers = await Issuer.find();
+    let listIssuer: Array<any> = [];
+    for (let i = 0; i < issuers.length; i++) {
+        const ans = await getIssuerInfor(issuers[i].issuerId!);
+        listIssuer.push(ans);
+    }
+    return listIssuer; 
 }

@@ -4,7 +4,7 @@ import { SchemaPropertyId, SchemaPropertyType, SchemaType } from "../common/enum
 import Schema from "../models/Schema.js";
 import { checkInEnum, getSchemaHashFromSchema } from "../util/utils.js";
 import { schema as zidenjsSchema } from "@zidendev/zidenjs";
-import { ZIDEN_SERVER_URI } from "../common/config/secrets.js";
+import { ISSUER_SERVER_URL, ZIDEN_SERVER_URI } from "../common/config/secrets.js";
 
 export async function createNewSchema(schema: any) {
     try {
@@ -26,13 +26,24 @@ export async function createNewSchema(schema: any) {
 
         newSchema["@id"] = v4();
 
-        await axios.request({
-            method: "POST",
-            url: `${ZIDEN_SERVER_URI}/api/v1/schemas/pull-request`,
-            data: {
-                schema: newSchema
-            }
-        });
+        try {
+            await axios.request({
+                method: "POST",
+                url: `${ZIDEN_SERVER_URI}/api/v1/schemas`,
+                data: {
+                    // schema: newSchema
+                    schema: {
+                        name: newSchema["@name"],
+                        hash: newSchema["@hash"],
+                        accessUri: `${ISSUER_SERVER_URL}/api/v1/schemas/${newSchema["@hash"]}`,
+                        jsonSchema: newSchema
+                    }
+                }
+            });
+        } catch (err) {
+
+        }
+        
 
         await newSchema.save();
         return newSchema;

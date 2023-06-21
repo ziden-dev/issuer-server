@@ -2,14 +2,10 @@ import { Request, Response } from "express";
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
-import { getChallengePublishAllClaims, getChallengeRevokeAllPendingRevoke, getCombinesChallenge as getCombineChallenge } from "../services/Challenge.js";
 import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.js";
-import { serializaData } from "../util/utils.js";
-import { SignedChallenge } from "@zidendev/zidenjs";
-import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
 import { createClaim, encodeClaim, getClaimByClaimId, getClaimStatus, getEntryData, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, saveClaim, saveEntryData, setRevokeClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
-import Claim from "../models/Claim.js";
+import { publishAndRevoke } from "../services/PublishAndRevokeClaim.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
@@ -145,6 +141,10 @@ export class ClaimsController {
             const claimId = await saveClaim(claim, schemaHash, holderId, issuerId, registryId);
             const { cipher, nonce, serverPublicKey } = await encodeClaim(claim, data, publicKey);
             
+            // publish claim
+            await publishAndRevoke(issuerId);
+            // end publish claim
+
             res.send({ claimId: claimId, encodeClaim: cipher, nonce: nonce, serverPublicKey: serverPublicKey });
         } catch (err: any) {
             console.log(err);
@@ -194,6 +194,11 @@ export class ClaimsController {
                     );
                 }
             }
+
+            // publish claim
+            await publishAndRevoke(issuerId);
+            // end publish
+
             res.status(200).send(claimResponse);
         } catch (err: any) {
             console.log(err);
@@ -220,238 +225,6 @@ export class ClaimsController {
             });
             const claims = await setRevokeClaim(revNonces, issuerId);
             res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async getPublishChallenge(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
-            }
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
-            }
-            await changeLockTreeState(issuerId, true);
-            try {
-                const challenge = await getChallengePublishAllClaims(issuerId);
-                res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, JSON.parse(serializaData({ challenge: challenge })), ResultMessage.APISUCCESS.message)
-                );
-                await changeLockTreeState(issuerId, false);
-                return;
-            } catch (err: any) {
-                await changeLockTreeState(issuerId, false);
-                throw(err);
-            }
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async getRevokeChallenge(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
-            }
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
-            }
-            await changeLockTreeState(issuerId, true);
-            try {
-                const challenge = await getChallengeRevokeAllPendingRevoke(issuerId);
-                res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, JSON.parse(serializaData({ challenge: challenge })), ResultMessage.APISUCCESS.message)
-                );
-                await changeLockTreeState(issuerId, false);
-                return;
-            } catch (err: any) {
-                await changeLockTreeState(issuerId, false);
-                throw(err);
-            }
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async getCombineChallenge(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
-            }
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
-            }
-            await changeLockTreeState(issuerId, true);
-            try {
-                const challenge = await getCombineChallenge(issuerId);
-                res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, JSON.parse(serializaData({ challenge: challenge })), ResultMessage.APISUCCESS.message)
-                );
-                await changeLockTreeState(issuerId, false);
-                return;
-            } catch (err: any) {
-                await changeLockTreeState(issuerId, false);
-                throw(err);
-            }
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async publishClaims(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
-            }
-            const {signature} = req.body;
-            if (!signature
-                || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
-                throw("Invalid signature");
-            }
-            const signChallenge: SignedChallenge = {
-                challenge: BigInt(signature["challenge"]),
-                challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
-                challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
-                challengeSignatureS: BigInt(signature["challengeSignatureS"])
-            }
-
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
-            }
-            await changeLockTreeState(issuerId, true);
-            try {
-                const response = await publishOnly(signChallenge, issuerId);
-                res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
-                );
-                await changeLockTreeState(issuerId, false);
-                return;
-            } catch (err: any) {
-                await changeLockTreeState(issuerId, false);
-                throw(err);
-            }        
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async revokeClaims(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
-            }
-            const {signature} = req.body;
-            if (!signature
-                || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
-                throw("Invalid signature");
-            }
-            const signChallenge: SignedChallenge = {
-                challenge: BigInt(signature["challenge"]),
-                challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
-                challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
-                challengeSignatureS: BigInt(signature["challengeSignatureS"])
-            }
-
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
-            }
-            await changeLockTreeState(issuerId, true);
-            try {
-                const response = await revokeOnly(signChallenge, issuerId);
-                res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
-                );
-                await changeLockTreeState(issuerId, false);
-                return;
-            } catch (err: any) {
-                await changeLockTreeState(issuerId, false);
-                throw(err);
-            }        
-        
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async publishAndRevokeClaims(req: Request, res: Response) {
-        try {
-            const {issuerId} = req.params;
-            if (!issuerId || typeof issuerId != "string") {
-                throw("Invalid issuerId");
-            }
-            const {signature} = req.body;
-            if (!signature
-                || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
-                throw("Invalid signature");
-            }
-            const signChallenge: SignedChallenge = {
-                challenge: BigInt(signature["challenge"]),
-                challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
-                challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
-                challengeSignatureS: BigInt(signature["challengeSignatureS"])
-            }
-
-            const checkLock = await checkLockTreeState(issuerId);
-            if (checkLock) {
-                throw("Await Publish!");
-            }
-            await changeLockTreeState(issuerId, true);
-            try {
-                const response = await publishAndRevoke(signChallenge, issuerId);
-                res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
-                );
-                await changeLockTreeState(issuerId, false);
-                return;
-            } catch (err: any) {
-                await changeLockTreeState(issuerId, false);
-                throw(err);
-            }        
-        
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async updateReviewingClaim(req: Request, res: Response) {
-        try {
-            const {claimId, status} = req.params;
-            if (!claimId || typeof claimId != "string") {
-                throw("Invalid claimId");
-            }
-            if (status != ClaimStatus.PENDING && status != ClaimStatus.REJECT) {
-                throw("Status must PENDING or REJECT")
-            }
-            const claim = await Claim.find({"id": claimId, "status": ClaimStatus.REVIEWING});
-            if (claim.length == 0) {
-                throw("Claim not REVIEWING");
-            }
-            for (let i = 0; i < claim.length; i++) {
-                claim[i].status = status;
-                await claim[i].save();
-            }
-            res.send(
-                buildResponse(ResultMessage.APISUCCESS.apiCode, {claimId: claimId, status: status}, ResultMessage.APISUCCESS.message)
-            );        
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));

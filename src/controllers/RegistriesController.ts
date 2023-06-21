@@ -25,9 +25,6 @@ export class RegistriesController {
             if (!issuerId) {
                 issuerId = "";
             }
-            if (!networkId) {
-                networkId = "0";
-            }
 
             if (typeof schemaHash != "string") {
                 throw("Invalid schemaHash");
@@ -36,37 +33,10 @@ export class RegistriesController {
             if (typeof issuerId != "string") {
                 throw("Invalid issuerId");
             }
-            
-            if (typeof networkId != "string" && typeof networkId != "number") {
-                throw("Invalid networkId");
-            }
 
-            const registries = await findSchemaRegistry(schemaHash, issuerId, Number(networkId));
+            const registries = await findSchemaRegistry(schemaHash, issuerId);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registries, ResultMessage.APISUCCESS.message));
 
-        } catch (err: any) {
-            console.log(err);
-            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
-        }
-    }
-
-    public async updateRegistrySchema(req: Request, res: Response) {
-        try {
-            const {registryId} = req.params;
-            if (!registryId || typeof registryId != "string") {
-                throw("Invalid registryId");
-            }
-            const {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl} = req.body;
-            if (schemaHash == undefined || issuerId == undefined 
-                || description == undefined || expiration == undefined 
-                || updatable == undefined || !endpointUrl == undefined || networkId == undefined
-                || typeof networkId != "number") {
-                throw("Invalid input");
-            }
-
-            const registry = await updateRegistry(registryId, schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl);
-            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registry, ResultMessage.APISUCCESS.message));
-        
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));

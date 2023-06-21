@@ -3,11 +3,8 @@ import Issuer from "../models/Issuer.js";
 import TreeState from "../models/TreeState.js";
 import { createNewLevelDb, openLevelDb, restoreDb } from "./LevelDbManager.js";
 import { v4 } from "uuid";
-import { OperatorType } from "../common/enum/EnumType.js";
 import { checkIssuerExisted, getIssuer, updateIssuer } from "./Issuer.js";
-import { checkOperatorExisted, saveNewOperator } from "./Operator.js";
 import { GlobalVariables } from "../common/config/global.js";
-import { registerNewIssuer } from "./Authen.js";
 import { serializaData } from "../util/utils.js";
 
 export async function saveTreeState(issuerTree: state.State) {
@@ -110,7 +107,11 @@ export async function getTreeState(issuerId: string) {
     return issuerTree;
 }
 
-export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
+export async function registerIssuer(privateKey: string) {
+    const privateKey2Buf = zidenjsUtils.hexToBuffer(privateKey, 32);
+    const pubkeyX = GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(privateKey2Buf)[0]).toString(10);
+    const pubkeyY = GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(privateKey2Buf)[1]).toString(10);
+
     const isRegister = await checkIssuerExisted(pubkeyX, pubkeyY);
     if (isRegister) {
         throw("Issuer is registed!");
@@ -136,27 +137,19 @@ export async function registerIssuer(pubkeyX: string, pubkeyY: string) {
                 
         const issuerId = zidenjsUtils.bufferToHex(newIssuerTree.userID);
         
-        const issuerRegisterResponse = await registerNewIssuer(issuerId);
 
         await updateIssuer(
             issuerId,
             newIssuerAuth.authHi.toString(10),
             pubkeyX,
             pubkeyY,
-            pathLevelDb
+            pathLevelDb,
+            privateKey
         );
         await saveTreeState(newIssuerTree);
         
-        const checkOperator = await checkOperatorExisted(issuerId!, issuerId!);
-        if (!checkOperator) {
-            await saveNewOperator(issuerId, OperatorType.ADMIN, issuerRegisterResponse.claimId, issuerId);
-        }
-
         return {
-            issuerId: issuerId,
-            claimId: issuerRegisterResponse.claimId,
-            version: issuerRegisterResponse.version,
-            revNonce: issuerRegisterResponse.revNonce
+            issuerId: issuerId
         };
     } catch (err: any) {
         throw(err);

@@ -11,13 +11,12 @@ import * as swaggerUi from "swagger-ui-express";
 import { readFileSync } from 'fs';
 import logger from './lib/logger/index.js';
 import morgan from 'morgan';
-import { AthenRoutes } from './routers/authenRoutes.js';
 import { IssuerRooutes } from './routers/issuersRoutes.js';
 import { ClaimsRouters } from './routers/claimsRoutes.js';
 import { SchemasRouter } from './routers/schemasRoutes.js';
 import { RegistriesRoutes } from './routers/registriesRoutes.js';
-import { NetWorkRoutes } from './routers/networksRoutes.js';
 import redoc from 'redoc-express';
+import { setupSchemaRegistry, setupIssuer } from './setup/setup.js';
 
 const swaggerDocument = JSON.parse(readFileSync("src/swagger/swagger.json", "utf-8"));
 
@@ -36,12 +35,10 @@ class Server {
   }
 
   public routes(): void {
-    this.app.use("/api/v1/auth", new AthenRoutes().router);
     this.app.use("/api/v1/issuers", new IssuerRooutes().router);
     this.app.use("/api/v1/claims", new ClaimsRouters().router);
     this.app.use("/api/v1/schemas", new SchemasRouter().router);
     this.app.use("/api/v1/registries", new RegistriesRoutes().router);
-    this.app.use("/api/v1/networks", new NetWorkRoutes().router);
   }
 
   public config(): void {
@@ -122,6 +119,8 @@ async function startServer(): Promise<void> {
   await GlobalVariables.init();
   const server = new Server();
   server.start();
+  await setupIssuer();
+  await setupSchemaRegistry();
 }
 
 startServer();

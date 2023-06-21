@@ -2,7 +2,6 @@ import { Auth, SignedChallenge, stateTransition as zidenStateTransition, utils a
 import { GlobalVariables as GlobalVariables } from "../common/config/global.js";
 import { ClaimStatus } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
-import { getPublishAndRevkeChallenge, getPublishChallenge, getRevokeChallenge } from "./Challenge.js";
 import { getIssuer } from "./Issuer.js";
 import { backupLastState, cloneDb, closeLevelDb, restoreDb } from "./LevelDbManager.js";
 import { checkLockTreeState, getTreeState, saveTreeState, saveLastStateTransistion } from "./TreeState.js";
@@ -12,69 +11,7 @@ import { ethers } from "ethers"
 import { serializaData } from "../util/utils.js";
 import { RPC_PROVIDER, STATE_ADDRESS } from "../common/config/secrets.js";
 
-export async function publishOnly(signature: SignedChallenge, issuerId: string) {    
-    const claims = await Claim.find({"status": ClaimStatus.PENDING, "issuerId": issuerId});
-    const claimIds: Array<string> = claims.map(claim => {
-        return claim.id!;
-    });
-    if (claimIds.length == 0) {
-        return;
-    }
-
-    const currentChallange = await getPublishChallenge(claimIds, issuerId);
-    if (currentChallange != signature.challenge) {
-        throw("signed challenge does not match current challenge");
-    }
-
-    const hihv: [ArrayLike<number>, ArrayLike<number>][] = claims.map(claim => {
-        return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];    
-    });
-
-    const result = await stateTransition(issuerId, signature, hihv, []);
-    if (result) {
-        for (let i = 0; i < claims.length; i++) {
-            claims[i].status = ClaimStatus.ACTIVE;
-            await claims[i].save();
-        }
-    }
-
-    return result;
-}
-
-export async function revokeOnly(signature: SignedChallenge, issuerId: string) {
-    const claims = await Claim.find({"status": ClaimStatus.PENDING_REVOKE, "issuerId": issuerId});
-    const claimIds: Array<string> = claims.map(claim => {
-        return claim.id!;
-    });
-
-    if (claimIds.length == 0) {
-        return;
-    }
-
-    const currentChallange = await getRevokeChallenge(claimIds, issuerId);
-    if (currentChallange != signature.challenge) {
-        throw("signed challenge does not match current challenge");
-    }
-
-    const revNonces: Array<BigInt> = [];
-    claims.forEach(claim => {
-        if (claim.revNonce) {
-            revNonces.push(BigInt(claim.revNonce));
-        }
-    })
-
-    const result = await stateTransition(issuerId, signature, [], revNonces);
-    if (result) {
-        for (let i = 0; i < claimIds.length; i++) {
-            claims[i].status = ClaimStatus.REVOKED;
-            await claims[i].save();
-        }
-    }    
-    
-    return result;
-}
-
-export async function publishAndRevoke(signature: SignedChallenge, issuerId: string) {
+export async function publishAndRevoke(issuerId: string) {
     const claimsPublish = await Claim.find({"status": ClaimStatus.PENDING, "issuerId": issuerId});
     const claimIdsPublish: Array<string> = claimsPublish.map(claim => {
         return claim.id!;
@@ -89,11 +26,6 @@ export async function publishAndRevoke(signature: SignedChallenge, issuerId: str
         return;
     }
 
-    const currentChallange = await getPublishAndRevkeChallenge(claimIdsPublish, claimIdsRevoke,issuerId);
-    if (currentChallange != signature.challenge) {
-        throw("signed challenge does not match current challenge");
-    }
-
     const hihv: [ArrayLike<number>, ArrayLike<number>][] = claimsPublish.map(claim => {
         return [GlobalVariables.F.e(claim.hi!), GlobalVariables.F.e(claim.hv!)];    
     });
@@ -104,7 +36,7 @@ export async function publishAndRevoke(signature: SignedChallenge, issuerId: str
         }
     })
 
-    const result = await stateTransition(issuerId, signature, hihv, revNonces);
+    const result = await stateTransition(issuerId, hihv, revNonces);
     if (result) {
         for (let i = 0; i < claimsPublish.length; i++) {
             claimsPublish[i].status = ClaimStatus.ACTIVE;
@@ -119,8 +51,10 @@ export async function publishAndRevoke(signature: SignedChallenge, issuerId: str
     return result;
 }
 
-export async function stateTransition(issuerId: string, signature: SignedChallenge, hihvBatch: Array<[ArrayLike<number>, ArrayLike<number>]>, revNonces: Array<BigInt>) {
+export async function stateTransition(issuerId: string, hihvBatch: Array<[ArrayLike<number>, ArrayLike<number>]>, revNonces: Array<BigInt>) {
     const issuer = await getIssuer(issuerId);
+    const privateKey2Buf = zidenjsUtils.hexToBuffer(issuer.privateKey!, 32);
+
     await cloneDb(issuer.pathDb!);
     const auth: Auth = {
         authHi: BigInt(issuer.authHi!),
@@ -133,8 +67,8 @@ export async function stateTransition(issuerId: string, signature: SignedChallen
     const issuerTree = await getTreeState(issuerId);
     
     try {
-        const stateTransitionInputs = await zidenStateTransition.stateTransitionWitnessWithSignatureAndHiHvs(
-            signature,
+        const stateTransitionInputs = await zidenStateTransition.stateTransitionWitnessWithPrivateKeyAndHiHvs(
+            privateKey2Buf,
             auth,
             issuerTree,
             [],
@@ -149,11 +83,11 @@ export async function stateTransition(issuerId: string, signature: SignedChallen
         const rand = Date.now().toString() + (Math.floor(Math.random() * 1000)).toString();
         fs.writeFileSync(`${statePath}/${rand}input.json`, (serializaData(stateTransitionInputs)));
         
-        execSync(`npx snarkjs calculatewitness ${statePath}/stateTransition.wasm ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`)
-        execSync(`npx snarkjs groth16 prove ${statePath}/stateTransition.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
+        // execSync(`npx snarkjs calculatewitness ${statePath}/stateTransition.wasm ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`)
+        // execSync(`npx snarkjs groth16 prove ${statePath}/stateTransition.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
         
-        // execSync(`${statePath}/stateTransition ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`);
-        // execSync(`${rapidSnarkPath}/prover ${statePath}/stateTransition.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
+        execSync(`${statePath}/stateTransition ${statePath}/${rand}input.json ${statePath}/${rand}witness.wtns`);
+        execSync(`${rapidSnarkPath}/prover ${statePath}/stateTransition.zkey ${statePath}/${rand}witness.wtns ${statePath}/${rand}proof.json ${statePath}/${rand}public.json`)
 
         // Prepare calldata for transitState 
         const out = execSync(`snarkjs zkey export soliditycalldata ${statePath}/${rand}public.json ${statePath}/${rand}proof.json`, { "encoding": "utf-8" }).toString().split(',').map(e => {

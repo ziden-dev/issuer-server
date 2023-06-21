@@ -41,9 +41,6 @@ export async function saveClaim(claim: zidenjsClaim.Entry, schemaHash: string, u
     
     try {
         let claimStatus = ClaimStatus.PENDING;
-        if (schemaHash == '21189809373272350628755683009063270') {
-            claimStatus = ClaimStatus.REVIEWING;
-        }
         await issuerTree.prepareClaimForInsert(claim);
         const newClaim = new Claim({
             id: claimId,
@@ -61,6 +58,7 @@ export async function saveClaim(claim: zidenjsClaim.Entry, schemaHash: string, u
             issuerId: issuerId,
             schemaRegistryId: schemaRegistryId
         });
+        
         await newClaim.save();
         await saveTreeState(issuerTree);
         // await closeLevelDb(claimsDb, revocationDb, rootsDb);

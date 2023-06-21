@@ -1,0 +1,25 @@
+[
+    {
+        "name": "Test service",
+        "verifierId": "",
+        "description": "This is a test service",
+        "networkId": "97",
+        "requirements": [
+            {
+                "title": "Age Restriction",
+                "attestation": "Born before 01/01/2005",
+                "allowedIssuers": [],
+                "schemaHash": "14595583831197040920310526944843389989",
+                "circuitId": "credentialAtomicQueryMTP",
+                "query": {
+                    "propertyName": "dob",
+                    "operator": 2,
+                    "value": [
+                        20010105
+                    ]
+                }
+
+            }
+        ]
+    }
+]
