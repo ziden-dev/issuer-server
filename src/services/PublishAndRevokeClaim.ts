@@ -105,7 +105,7 @@ export async function stateTransition(issuerId: string, hihvBatch: Array<[ArrayL
         const provider = new ethers.providers.JsonRpcProvider(RPC_PROVIDER);
         const secret = JSON.parse(fs.readFileSync("secret.json", "utf-8"))
         const wallet = new ethers.Wallet(secret.pk, provider);
-        const stateABI = JSON.parse(fs.readFileSync("build/abis/State.json", "utf-8"))
+        const stateABI = JSON.parse(fs.readFileSync("src/abis/State.json", "utf-8"))
         const state = new ethers.Contract(STATE_ADDRESS, stateABI, provider);
 
         const transitState = await state.connect(wallet).functions.transitState(publicSig[0], publicSig[1], publicSig[2], publicSig[3], a, b, c, { gasLimit: 3000000 });
