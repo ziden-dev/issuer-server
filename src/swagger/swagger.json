@@ -61,6 +61,21 @@
                         "format": "int64",
                         "description": "Number Holders in this Issuer Servers.",
                         "example": 10
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "issuer name",
+                        "example": "issuer 1"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "description about issuer",
+                        "example": "description"
+                      },
+                      "logoUrl": {
+                        "type": "string",
+                        "description": "logo url",
+                        "example": "examp.logo.url"
                       }
                     }
                   }
@@ -131,6 +146,21 @@
                       "format": "int64",
                       "description": "Number Holders in this Issuer Servers.",
                       "example": 10
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "issuer name",
+                      "example": "issuer 1"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "description about issuer",
+                      "example": "description"
+                   },
+                    "logoUrl": {
+                      "type": "string",
+                      "description": "logo url",
+                      "example": "examp.logo.url"
                     }
                   }
                 }

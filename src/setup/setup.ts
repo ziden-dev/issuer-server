@@ -12,8 +12,12 @@ import { createNewSchema } from "../services/Schema.js";
 import { createNewRegistry } from "../services/RegistryService.js";
 import SchemaRegistry from "../models/SchemaRegistry.js";
 import axios from "axios";
+import { saveIssuer, updateIssuer } from "../services/Issuer.js";
 
 export async function setupIssuer() {
+    const issuerProfiles = JSON.parse(
+        fs.readFileSync("setup/issuer.json", "utf-8")
+    );
   try {
     for (let i = 0; i < ISSUER_PRIVATE_KEY.length; i++) {
       const privateKey = ISSUER_PRIVATE_KEY[i];
@@ -25,13 +29,14 @@ export async function setupIssuer() {
       const pubkeyY = GlobalVariables.F.toObject(
         GlobalVariables.eddsa.prv2pub(privateKey2Buf)[1]
       ).toString(10);
-
       const issuer = await Issuer.findOne({
         pubkeyX: pubkeyX,
         pubkeyY: pubkeyY,
       });
       if (!issuer) {
-        await registerIssuer(privateKey);
+        await registerIssuer(privateKey, issuerProfiles[i].name, issuerProfiles[i].description, issuerProfiles[i].logoUrl);
+      } else {
+        await updateIssuer(issuer.issuerId!, issuer.authHi!, issuer.pubkeyX!, issuer.pubkeyY!, issuer.pathDb!, issuer.privateKey!, issuerProfiles[i].name, issuerProfiles[i].description, issuerProfiles[i].logoUrl)
       }
     }
   } catch (err) {

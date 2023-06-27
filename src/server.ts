@@ -47,6 +47,7 @@ class Server {
     this.app.use(express.urlencoded({ extended: true, limit: '50mb', parameterLimit: 1000000 }));
     this.app.use(compression());
     this.app.use(cors());
+    this.app.use('/public', express.static('public'));
 
     const myStream = {
       write: (text: any) => {

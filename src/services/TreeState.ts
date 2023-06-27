@@ -107,7 +107,7 @@ export async function getTreeState(issuerId: string) {
     return issuerTree;
 }
 
-export async function registerIssuer(privateKey: string) {
+export async function registerIssuer(privateKey: string, name: string, description: string, logoUrl: string) {
     const privateKey2Buf = zidenjsUtils.hexToBuffer(privateKey, 32);
     const pubkeyX = GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(privateKey2Buf)[0]).toString(10);
     const pubkeyY = GlobalVariables.F.toObject(GlobalVariables.eddsa.prv2pub(privateKey2Buf)[1]).toString(10);
@@ -144,7 +144,10 @@ export async function registerIssuer(privateKey: string) {
             pubkeyX,
             pubkeyY,
             pathLevelDb,
-            privateKey
+            privateKey,
+            name,
+            description,
+            logoUrl
         );
         await saveTreeState(newIssuerTree);
         

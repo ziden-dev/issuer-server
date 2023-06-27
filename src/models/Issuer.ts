@@ -6,7 +6,10 @@ const Issuer = new mongoose.Schema({
     pubkeyX: String,
     pubkeyY: String,
     pathDb: String,
-    privateKey: String
+    privateKey: String,
+    name: String,
+    description: String,
+    logoUrl: String
 });
 
 export default mongoose.model("Issuer", Issuer);

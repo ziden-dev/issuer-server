@@ -1,0 +1,27 @@
+[
+    {
+        "name": "issuer 1",
+        "description": "This is issuer 1",
+        "logoUrl": "http://localhost:3000/public/default-logo.png"
+    },
+    {
+        "name": "issuer 2",
+        "description": "This is issuer 2",
+        "logoUrl": "http://localhost:3000/public/default-logo.png"
+    },
+    {
+        "name": "issuer 3",
+        "description": "This is issuer 3",
+        "logoUrl": "http://localhost:3000/public/default-logo.png"
+    },
+    {
+        "name": "issuer 4",
+        "description": "This is issuer 4",
+        "logoUrl": "http://localhost:3000/public/default-logo.png"
+    },
+    {
+        "name": "issuer 5",
+        "description": "This is issuer 5",
+        "logoUrl": "http://localhost:3000/public/default-logo.png"
+    }
+]

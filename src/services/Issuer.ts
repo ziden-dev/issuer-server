@@ -2,7 +2,7 @@ import { ClaimStatus } from "../common/enum/EnumType.js";
 import Claim from "../models/Claim.js";
 import Issuer from "../models/Issuer.js";
 
-export async function saveIssuer(issuerId: string, authHi: string, pubkeyX: string, pubkeyY: string, pathDb: string) {
+export async function saveIssuer(issuerId: string, authHi: string , pubkeyX: string, pubkeyY: string, pathDb: string, privateKey: string, name: string, description: string, logoUrl: string) {
     const checkIssuer = await Issuer.findOne({issuerId: issuerId});
     if (!checkIssuer) {
         const issuer = new Issuer({
@@ -10,7 +10,10 @@ export async function saveIssuer(issuerId: string, authHi: string, pubkeyX: stri
             authHi: authHi,
             pubkeyX: pubkeyX,
             pubkeyY: pubkeyY,
-            pathDb: pathDb
+            pathDb: pathDb,
+            name: name,
+            description: description,
+            logoUrl: logoUrl
         });
         await issuer.save();
     } else {
@@ -29,12 +32,15 @@ export async function getIssuer(issuerId: string) {
             pubkeyX: issuer.pubkeyX,
             pubkeyY: issuer.pubkeyY,
             pathDb: issuer.pathDb,
-            privateKey: issuer.privateKey
+            privateKey: issuer.privateKey,
+            name: issuer.name,
+            description: issuer.description,
+            logoUrl: issuer.logoUrl
         }
     }
 }
 
-export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: string, pubkeyY: string, pathDb: string, privateKey: string) {
+export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: string, pubkeyY: string, pathDb: string, privateKey: string, name: string, description: string, logoUrl: string) {
     const checkIssuer = await Issuer.findOne({issuerId: issuerId});
     if (!checkIssuer) {
         const issuer = new Issuer({
@@ -43,7 +49,10 @@ export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: s
             pubkeyX: pubkeyX,
             pubkeyY: pubkeyY,
             pathDb: pathDb,
-            privateKey: privateKey
+            privateKey: privateKey,
+            name: name,
+            description: description,
+            logoUrl: logoUrl
         });
         await issuer.save();
     } else {
@@ -51,6 +60,9 @@ export async function updateIssuer(issuerId: string, authHi: string , pubkeyX: s
         checkIssuer.authHi = authHi;
         checkIssuer.pubkeyX = pubkeyX;
         checkIssuer.pubkeyY = pubkeyY;
+        checkIssuer.name = name;
+        checkIssuer.description = description;
+        checkIssuer.logoUrl = logoUrl;
         await checkIssuer.save();
     }
 }
@@ -75,11 +87,17 @@ export async function checkIssuerExisted(pubkeyX: string, pubkeyY: string) {
 export async function getIssuerInfor(issuerId: string) {
     const numPublishClaims = await Claim.countDocuments({"issuerId": issuerId, status: ClaimStatus.ACTIVE});
     const numHolders = (await Claim.aggregate([{"$match": {"issuerId": issuerId}}, {"$group": {_id: "$userId"}}])).length;
-        
+    const issuer = (await Issuer.findOne({issuerId: issuerId}));
+    if (!issuer) {
+        throw("Issuer not existed!");
+    }
     return {
         issuerId: issuerId,
         numPublishClaims: numPublishClaims,
-        numHolders: numHolders
+        numHolders: numHolders,
+        name: issuer.name,
+        description: issuer.description,
+        logoUrl: issuer.logoUrl
     }
 }
 
