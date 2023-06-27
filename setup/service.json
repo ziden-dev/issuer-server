@@ -1,25 +1,124 @@
 [
-    {
-        "name": "Test service",
-        "verifierId": "",
-        "description": "This is a test service",
-        "networkId": "97",
-        "requirements": [
-            {
-                "title": "Age Restriction",
-                "attestation": "Born before 01/01/2005",
-                "allowedIssuers": [],
-                "schemaHash": "14595583831197040920310526944843389989",
-                "circuitId": "credentialAtomicQueryMTP",
-                "query": {
-                    "propertyName": "dob",
-                    "operator": 2,
-                    "value": [
-                        20010105
-                    ]
-                }
+  {
+    "name": "Web2 Service 1",
+    "verifierId": "",
+    "description": "This is a web2 service",
+    "networkId": "97",
+    "requirements": [
+      {
+        "title": "Age Restriction",
+        "attestation": "Born before 01/01/2005",
+        "allowedIssuers": [
+          "71ba919229d4ae3acb2671e02b0070edea725671238d2e3c7281c152b0000"
+        ],
+        "schemaHash": "16091311942002796696058152351915143299",
+        "circuitId": "credentialAtomicQueryMTP",
+        "query": {
+          "propertyName": "date-of-birth",
+          "operator": 2,
+          "value": [20050101]
+        }
+      },
+      {
+        "title": "Nationality Restriction",
+        "attestation": "Should be one of these following nationalities",
+        "allowedIssuers": [
+          "71ba919229d4ae3acb2671e02b0070edea725671238d2e3c7281c152b0000"
+        ],
+        "schemaHash": "16091311942002796696058152351915143299",
+        "circuitId": "credentialAtomicQueryMTP",
+        "query": {
+          "propertyName": "nationality",
+          "operator": 4,
+          "value": [
+            764, 626, 768, 772, 776, 780, 788, 792, 795, 796, 798, 800, 804,
+            784, 826, 581, 840, 858, 860, 548, 862, 704, 92, 850, 876, 732, 887,
+            894, 716
+          ]
+        }
+      }
+    ]
+  },
 
-            }
-        ]
-    }
+  {
+    "isContract": true,
+    "name": "Web3 service 1",
+    "verifierId": "",
+    "description": "This is a web3 service",
+    "networkId": "97",
+    "requirements": [
+      {
+        "title": "Contry of Residence Restriction",
+        "attestation": "Should not be any of these following countrie codes",
+        "allowedIssuers": [
+          "2a4b8be407bf5f862a5a1913251f48728404d350f9bfdfd61b57a13b650000"
+        ],
+        "schemaHash": "15875802187898359899926143492495211724",
+        "circuitId": "credentialAtomicQueryMTP",
+        "query": {
+          "propertyName": "country-of-residence",
+          "operator": 5,
+          "value": [4, 248, 8, 12, 16, 20, 24, 660, 10]
+        }
+      }
+    ]
+  },
+
+  {
+    "isContract": true,
+    "name": "Web3 service 2",
+    "verifierId": "",
+    "description": "This is a web3 service",
+    "networkId": "97",
+    "requirements": [
+      {
+        "title": "Gender Restriction",
+        "attestation": "Should be clear",
+        "allowedIssuers": [
+          "2a4b8be407bf5f862a5a1913251f48728404d350f9bfdfd61b57a13b650000"
+        ],
+        "schemaHash": "15875802187898359899926143492495211724",
+        "circuitId": "credentialAtomicQueryMTP",
+        "query": {
+          "propertyName": "gender",
+          "operator": 5,
+          "value": [2]
+        }
+      },
+
+      {
+        "title": "Age Restriction",
+        "attestation": "Your age should be in between 18 and 60",
+        "allowedIssuers": [
+          "223be2dd7bacf227b59c28ed694c39addf469df9fb3ad3baf15fbaf53c0000"
+        ],
+        "schemaHash": "11092025297414919471403818670868991275",
+        "circuitId": "credentialAtomicQueryMTP",
+        "query": {
+          "propertyName": "date-of-birth",
+          "operator": 6,
+          "value": [20050101, 19630101]
+        }
+      },
+
+      {
+        "title": "Nationality Restriction",
+        "attestation": "Should be one of these following nationalities",
+        "allowedIssuers": [
+          "223be2dd7bacf227b59c28ed694c39addf469df9fb3ad3baf15fbaf53c0000"
+        ],
+        "schemaHash": "11092025297414919471403818670868991275",
+        "circuitId": "credentialAtomicQueryMTP",
+        "query": {
+          "propertyName": "nationality",
+          "operator": 4,
+          "value": [
+            764, 626, 768, 772, 776, 780, 788, 792, 795, 796, 798, 800, 804,
+            784, 826, 581, 840, 858, 860, 548, 862, 704, 92, 850, 876, 732, 887,
+            894, 716
+          ]
+        }
+      }
+    ]
+  }
 ]
