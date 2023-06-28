@@ -35,10 +35,6 @@ export class AuthenController {
         return;
       }
       let token = req.headers.authorization;
-      if (token == "1") {
-        next();
-        return;
-      }
       if (typeof token != "string") {
         throw("Invalid token");
       }
@@ -65,11 +61,7 @@ export class AuthenController {
         res.send(buildErrorMessage(200, "IssuerId invalid", "Unable to login"));
         return;
       }
-      let token = req.headers.authorization;
-      if (token == "1") {
-        next();
-        return;
-      }
+      let token = req.headers.authorization
       if (typeof token != "string") {
         throw("Invalid token");
       }
