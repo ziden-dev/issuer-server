@@ -5,17 +5,16 @@ import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getChallengePublishAllClaims, getChallengeRevokeAllPendingRevoke, getCombinesChallenge as getCombineChallenge } from "../services/Challenge.js";
 import { changeLockTreeState, checkLockTreeState } from "../services/TreeState.js";
 import { serializaData } from "../util/utils.js";
-import { claim as zidenjsClaim } from "zidenjs";
+import { SignedChallenge } from "@zidendev/zidenjs";
 import { publishAndRevoke, publishOnly, revokeOnly } from "../services/PublishAndRevokeClaim.js";
 import { createClaim, encodeClaim, getClaimByClaimId, getClaimStatus, getEntryData, getNonRevQueryMTPInput, getQueryMTPInput, queryClaim, saveClaim, saveEntryData, setRevokeClaim } from "../services/Claim.js";
 import { ClaimStatus, ProofTypeQuery } from "../common/enum/EnumType.js";
-import Schema from "../models/Schema.js";
-import { createNewSchema } from "../services/Schema.js";
+import Claim from "../models/Claim.js";
 
 export class ClaimsController {
     public async queryClaim(req: Request, res: Response) {
         try {
-            let {issuerId, status, holderId, schemaHash} = req.query;
+            let {issuerId, status, holderId, schemaHash, claimId} = req.query;
             if (!issuerId) {
                 issuerId = "";
             }
@@ -31,12 +30,18 @@ export class ClaimsController {
             if (!schemaHash) {
                 schemaHash = "";
             }
+            if (!claimId) {
+                claimId = [];
+            }
+            if (typeof claimId == "string") {
+                claimId = [claimId];
+            }
 
             if (typeof issuerId != "string" || typeof holderId != "string" || typeof schemaHash != "string") {
                 throw("Invalid query input");
             }
 
-            const claims = await queryClaim(issuerId, status as string[], holderId, schemaHash);
+            const claims = await queryClaim(issuerId, status as string[], holderId, schemaHash, claimId as string[]);
             res.send(
                 buildResponse(ResultMessage.APISUCCESS.apiCode, claims, ResultMessage.APISUCCESS.message)
             );
@@ -54,12 +59,21 @@ export class ClaimsController {
                 throw("Invalid claimId!");
             }
 
+            if (type != ProofTypeQuery.MTP && type != ProofTypeQuery.NON_REV_MTP) {
+                throw("Invalid type");
+            }
+
             const claim = await getClaimByClaimId(id);
+        
             if (claim.status != ClaimStatus.ACTIVE) {
                 throw("Claim is not ACTIVE");
             }
 
             let queryResponse = {};
+            const checkLock = await checkLockTreeState(claim.issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
 
             if (type == ProofTypeQuery.MTP) {
                 queryResponse = await getQueryMTPInput(claim.issuerId, claim.hi);
@@ -117,6 +131,11 @@ export class ClaimsController {
             if (!issuerId || typeof issuerId != "string") {
                 throw("Invalid issuerId");
             }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
+            }
+            
             if (!holderId || !registryId || !publicKey || !data
                 || typeof holderId != "string" || typeof registryId != "string" || typeof publicKey != "string") {
                     throw("Invalid data");
@@ -139,6 +158,10 @@ export class ClaimsController {
             const {issuerId} = req.params;
             if (!issuerId || typeof issuerId != "string") {
                 throw("Invalid issuerId");
+            }
+            const checkLock = await checkLockTreeState(issuerId);
+            if (checkLock) {
+                throw("Await Publish!");
             }
 
             for (let i = 0; i < req.body.length; i++) {
@@ -180,7 +203,13 @@ export class ClaimsController {
 
     public async revokeListClaims(req: Request, res: Response) {
         try {
+            const {issuerId} = req.params;
+            if (issuerId == undefined || typeof issuerId != "string") {
+                throw("Invalid issuerId");
+            }
+
             const {revNonces} = req.body;
+
             if (revNonces == undefined || revNonces.length == 0) {
                 throw ("Required array revNonces to revoke");
             }
@@ -189,8 +218,8 @@ export class ClaimsController {
                     throw("revNonces must be array number");
                 }
             });
-            const claims = await setRevokeClaim(revNonces);
-            res.status(400).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
+            const claims = await setRevokeClaim(revNonces, issuerId);
+            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {claims: claims}, ResultMessage.APISUCCESS.message))
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -292,7 +321,7 @@ export class ClaimsController {
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
                 throw("Invalid signature");
             }
-            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+            const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
                 challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
                 challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
@@ -305,9 +334,9 @@ export class ClaimsController {
             }
             await changeLockTreeState(issuerId, true);
             try {
-                await publishOnly(signChallenge, issuerId);
+                const response = await publishOnly(signChallenge, issuerId);
                 res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message)
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
                 );
                 await changeLockTreeState(issuerId, false);
                 return;
@@ -332,7 +361,7 @@ export class ClaimsController {
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
                 throw("Invalid signature");
             }
-            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+            const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
                 challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
                 challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
@@ -345,9 +374,9 @@ export class ClaimsController {
             }
             await changeLockTreeState(issuerId, true);
             try {
-                await revokeOnly(signChallenge, issuerId);
+                const response = await revokeOnly(signChallenge, issuerId);
                 res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message)
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
                 );
                 await changeLockTreeState(issuerId, false);
                 return;
@@ -373,7 +402,7 @@ export class ClaimsController {
                 || !signature["challenge"] || !signature["challengeSignatureR8x"] || !signature["challengeSignatureR8y"] || !signature["challengeSignatureS"]) {
                 throw("Invalid signature");
             }
-            const signChallenge: zidenjsClaim.authClaim.SignedChallenge = {
+            const signChallenge: SignedChallenge = {
                 challenge: BigInt(signature["challenge"]),
                 challengeSignatureR8x: BigInt(signature["challengeSignatureR8x"]),
                 challengeSignatureR8y: BigInt(signature["challengeSignatureR8y"]),
@@ -386,9 +415,9 @@ export class ClaimsController {
             }
             await changeLockTreeState(issuerId, true);
             try {
-                await publishAndRevoke(signChallenge, issuerId);
+                const response = await publishAndRevoke(signChallenge, issuerId);
                 res.send(
-                    buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message)
+                    buildResponse(ResultMessage.APISUCCESS.apiCode, {status: response}, ResultMessage.APISUCCESS.message)
                 );
                 await changeLockTreeState(issuerId, false);
                 return;
@@ -397,6 +426,32 @@ export class ClaimsController {
                 throw(err);
             }        
         
+        } catch (err: any) {
+            console.log(err);
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+        }
+    }
+
+    public async updateReviewingClaim(req: Request, res: Response) {
+        try {
+            const {claimId, status} = req.params;
+            if (!claimId || typeof claimId != "string") {
+                throw("Invalid claimId");
+            }
+            if (status != ClaimStatus.PENDING && status != ClaimStatus.REJECT) {
+                throw("Status must PENDING or REJECT")
+            }
+            const claim = await Claim.find({"id": claimId, "status": ClaimStatus.REVIEWING});
+            if (claim.length == 0) {
+                throw("Claim not REVIEWING");
+            }
+            for (let i = 0; i < claim.length; i++) {
+                claim[i].status = status;
+                await claim[i].save();
+            }
+            res.send(
+                buildResponse(ResultMessage.APISUCCESS.apiCode, {claimId: claimId, status: status}, ResultMessage.APISUCCESS.message)
+            );        
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));

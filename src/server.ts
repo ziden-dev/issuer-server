@@ -17,7 +17,7 @@ import { ClaimsRouters } from './routers/claimsRoutes.js';
 import { SchemasRouter } from './routers/schemasRoutes.js';
 import { RegistriesRoutes } from './routers/registriesRoutes.js';
 import { NetWorkRoutes } from './routers/networksRoutes.js';
-import { setupAuthenTree } from './services/TreeState.js';
+import redoc from 'redoc-express';
 
 const swaggerDocument = JSON.parse(readFileSync("src/swagger/swagger.json", "utf-8"));
 
@@ -95,6 +95,16 @@ class Server {
 
   private configSwagger(): void {
     this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    this.app.get('/docs/swagger.json', (req, res) => {
+      res.send(swaggerDocument);
+    });  
+    this.app.get(
+      '/docs',
+      redoc({
+        title: 'API Docs',
+        specUrl: '/docs/swagger.json'
+      })
+    );
   }
 
   public start(): void {
@@ -112,7 +122,6 @@ async function startServer(): Promise<void> {
   await GlobalVariables.init();
   const server = new Server();
   server.start();
-  setupAuthenTree();
 }
 
 startServer();

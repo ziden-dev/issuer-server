@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 
 const Network = new mongoose.Schema({
-    id: String,
-    chainId: String,
+    networkId: Number,
     createAt: Number,
     name: String,
     shotName: String,

@@ -4,7 +4,7 @@ import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
 import { getAllIssuer, getIssuerInfor } from "../services/Issuer.js";
 import { createNewOperator, disableOperator, getListOperator, getOperatorInfor } from "../services/Operator.js";
-import { registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
+import { checkLockTreeState, getLastestAuthClaimPath, registerIssuer, restoreLastStateTransition } from "../services/TreeState.js";
 
 export class IssuerController {
     public async registerIssuer(req: Request, res: Response) {
@@ -50,8 +50,13 @@ export class IssuerController {
                 throw("OperatorId invalid!");
             }
 
-            await createNewOperator(operatorId, issuerId);
-            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, {}, ResultMessage.APISUCCESS.message));
+            let token = req.headers.authorization;
+            if (!token || typeof token != "string") {
+                throw("Invalid token");
+            }
+
+            const response = await createNewOperator(operatorId, issuerId, token);
+            res.status(200).send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
@@ -67,6 +72,11 @@ export class IssuerController {
 
             if (!operatorId || typeof operatorId != "string") {
                 throw("OperatorId invalid!");
+            }
+
+            let token = req.headers.authorization;
+            if (!token || typeof token != "string") {
+                throw("Invalid token");
             }
 
             await disableOperator(operatorId, issuerId);
@@ -130,9 +140,28 @@ export class IssuerController {
 
     public async getAllIssuerId(req: Request, res: Response) {
         try {
-            const ans = await getAllIssuer();
+            let {operatorId} = req.query;
+            if (typeof operatorId != 'string' || operatorId == undefined) {
+                operatorId = '';
+            }
+
+            const ans = await getAllIssuer(operatorId);
             res.status(200).send(ans);
             return;
+        } catch (err: any) {
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+        }
+    }
+
+    public async getAuthenPath(req: Request, res: Response) {
+        try {
+            const {issuerId} = req.params;
+            if (!issuerId) {
+                throw("Invalid issuerId");
+            }
+
+            const response = await getLastestAuthClaimPath(issuerId);
+            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, response, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
         }

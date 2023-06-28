@@ -7,8 +7,8 @@ import { changeStatusRegistry, createNewRegistry, findSchemaRegistry, updateRegi
 export class RegistriesController {
     public async registerNewSchemaRegistry(req: Request, res: Response) {
         try {
-            const {schemaHash, issuerId, description, expiration, updatable, network, endpointUrl} = req.body;
-            const registry = await createNewRegistry(schemaHash, issuerId, description, expiration, updatable, network, endpointUrl);
+            const {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl} = req.body;
+            const registry = await createNewRegistry(schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registry, ResultMessage.APISUCCESS.message));
         } catch (err: any) {
             console.log(err);
@@ -18,15 +18,15 @@ export class RegistriesController {
 
     public async findSchemaRegistry(req: Request, res: Response) {
         try {
-            let {schemaHash, issuerId, network} = req.query;
+            let {schemaHash, issuerId, networkId} = req.query;
             if (!schemaHash) {
                 schemaHash = "";
             }
             if (!issuerId) {
                 issuerId = "";
             }
-            if (!network) {
-                network = "";
+            if (!networkId) {
+                networkId = "0";
             }
 
             if (typeof schemaHash != "string") {
@@ -36,12 +36,12 @@ export class RegistriesController {
             if (typeof issuerId != "string") {
                 throw("Invalid issuerId");
             }
-
-            if (typeof network != "string") {
-                throw("Invalid network");
+            
+            if (typeof networkId != "string" && typeof networkId != "number") {
+                throw("Invalid networkId");
             }
 
-            const registries = await findSchemaRegistry(schemaHash, issuerId, network);
+            const registries = await findSchemaRegistry(schemaHash, issuerId, Number(networkId));
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registries, ResultMessage.APISUCCESS.message));
 
         } catch (err: any) {
@@ -56,14 +56,15 @@ export class RegistriesController {
             if (!registryId || typeof registryId != "string") {
                 throw("Invalid registryId");
             }
-            const {schemaHash, issuerId, description, expiration, updatable, network, endpointUrl} = req.body;
+            const {schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl} = req.body;
             if (schemaHash == undefined || issuerId == undefined 
                 || description == undefined || expiration == undefined 
-                || updatable == undefined || !endpointUrl == undefined) {
+                || updatable == undefined || !endpointUrl == undefined || networkId == undefined
+                || typeof networkId != "number") {
                 throw("Invalid input");
             }
 
-            const registry = await updateRegistry(registryId, schemaHash, issuerId, description, expiration, updatable, network, endpointUrl);
+            const registry = await updateRegistry(registryId, schemaHash, issuerId, description, expiration, updatable, networkId, endpointUrl);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registry, ResultMessage.APISUCCESS.message));
         
         } catch (err: any) {

@@ -1,17 +1,30 @@
-import { global as zidenjsParams } from "zidenjs";
-
+import {
+    EDDSA,
+    Hash0,
+    Hash1,
+    Hasher,
+    SnarkField,
+    db,
+    params as zidenjsParams,
+} from "@zidendev/zidenjs";
 export class GlobalVariables {
-    public static hasher: zidenjsParams.Hasher;
-    public static F: zidenjsParams.SnarkField;
-    public static hash0: zidenjsParams.Hash0;
-    public static hash1: zidenjsParams.Hash1;
+    public static hasher: Hasher;
+    public static F: SnarkField;
+    public static hash0: Hash0;
+    public static hash1: Hash1;
     public static hashFunction: {
         (left: BigInt, right: BigInt): BigInt;
     };
-    public static eddsa: zidenjsParams.EDDSA;
+    public static eddsa: EDDSA;
+    public static levelDb: {
+        [key: string]: {
+            authsDb: db.SMTLevelDb;
+            claimsDb: db.SMTLevelDb;
+            claimRevDb: db.SMTLevelDb;
+        };
+    };
 
-    constructor() {
-    }
+    constructor() { }
 
     public static async init(): Promise<void> {
         await zidenjsParams.setupParams();
@@ -22,5 +35,7 @@ export class GlobalVariables {
         GlobalVariables.hash1 = params.hash1;
         GlobalVariables.eddsa = params.eddsa;
         GlobalVariables.hashFunction = params.fmtHash;
+        GlobalVariables.levelDb = {};
     }
+
 }

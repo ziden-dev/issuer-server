@@ -10,7 +10,9 @@ export const RPC_PROVIDER = process.env.RPC_PROVIDER ?? "https://data-seed-prebs
 export const isProduction = process.env.NODE_ENV == "production";
 export const LOG_LEVEL = process.env.LOG_LEVEL ?? "debug";
 export const LOG_OUTPUT = process.env.LOG_OUTPUT ?? "dev";
-export const ZIDEN_SERVER_URI = process.env.ZIDEN_SERVER_URI ?? "http://128.199.177.63:5000";
+export const ZIDEN_SERVER_URI = process.env.ZIDEN_SERVER_URI ?? "http://localhost:5000";
 export const PUBKEYX = process.env.PUBKEYX ?? "0";
 export const PUBKEYY = process.env.PUBKEYY ?? "0";
 export const PRIVATEKEY = process.env.PRIVATEKEY ?? "0";
+
+export const AUTHEN_SERVER = process.env.AUTHEN_SERVER ?? "http://localhost:3001"; 

@@ -1,13 +1,8 @@
-
-import { getNetwork } from "@ethersproject/networks";
-import { v4 } from "uuid";
 import Network from "../models/Network.js";
 
-export async function checkNetworkExisted(chainId: string, name: string, shotName: string): Promise<boolean> {
+export async function checkNetworkExisted(networkId: number): Promise<boolean> {
     const lastNetwork = await Network.findOne({
-        chainId: chainId,
-        name: name,
-        shotName: shotName
+        networkId: networkId
     });
 
     if (lastNetwork) {
@@ -17,14 +12,13 @@ export async function checkNetworkExisted(chainId: string, name: string, shotNam
     }
 }
 
-export async function createNetwork(chainId: string, name: string, shotName: string) {
-    const isNetworkExisted = await checkNetworkExisted(chainId, name, shotName);
+export async function createNetwork(networkId: number, name: string, shotName: string) {
+    const isNetworkExisted = await checkNetworkExisted(networkId);
     if (isNetworkExisted) {
         throw ("Network is existed")
     }
     const network = new Network({
-        id: v4(),
-        chainId: chainId,
+        networkId: networkId,
         createAt: Number(Date.now()),
         name: name,
         shotName: shotName,
@@ -32,8 +26,7 @@ export async function createNetwork(chainId: string, name: string, shotName: str
     })
     await network.save();
     return {
-        id: network.id,
-        chainId: network.chainId,
+        networkId: network.networkId,
         createAt: network.createAt,
         name: network.name,
         shotname: network.shotName,
@@ -41,20 +34,18 @@ export async function createNetwork(chainId: string, name: string, shotName: str
     }
 }
 
-export async function updateNetwork(id: string, chainId: string, name: string, shotName: string) {
-    const lastNetwork = await Network.findOne({ id: id })
+export async function updateNetwork(networkId: number, name: string, shotName: string) {
+    const lastNetwork = await Network.findOne({ networkId: networkId })
     if (!lastNetwork) {
         throw ("Network is not existed")
     }
     else {
-        lastNetwork.chainId = chainId;
         lastNetwork.name = name;
         lastNetwork.shotName = shotName;
         lastNetwork.updateAt = Number(Date.now());
         await lastNetwork.save();
         return {
-            id: lastNetwork.id,
-            chainId: lastNetwork.chainId,
+            networkId: lastNetwork.networkId,
             createAt: lastNetwork.createAt,
             name: lastNetwork.name,
             shotname: lastNetwork.shotName,
@@ -63,8 +54,8 @@ export async function updateNetwork(id: string, chainId: string, name: string, s
     }
 }
 
-export async function removeNetwork(id: string) {
-    const lastNetwork = await Network.findOne({ id: id })
+export async function removeNetwork(networkId: string) {
+    const lastNetwork = await Network.findOne({ networkId: networkId })
     if (!lastNetwork) {
         throw ("Network is not existed")
     }
@@ -73,15 +64,14 @@ export async function removeNetwork(id: string) {
     }
 }
 
-export async function getNetworkById(id: string) {
-    const network = await Network.findOne({ id: id })
+export async function getNetworkById(networkId: string) {
+    const network = await Network.findOne({ networkId: networkId })
     if (!network) {
         throw ("Network is not existed")
     }
     else {
         return {
-            id: network.id,
-            chainId: network.chainId,
+            networkId: network.networkId,
             createAt: network.createAt,
             name: network.name,
             shotName: network.shotName,
@@ -98,8 +88,7 @@ export async function getAllNetworks() {
     else {
         return allNetworks.map(e => {
             return {
-                id: e.id,
-                chainId: e.chainId,
+                networkId: e.networkId,
                 createAt: e.createAt,
                 name: e.name,
                 shotName: e.shotName,
