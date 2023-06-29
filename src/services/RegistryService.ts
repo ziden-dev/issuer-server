@@ -118,6 +118,39 @@ export async function findSchemaRegistry(schemaHash: string, issuerId: string) {
     return response;
 }
 
+
+export async function findOneRegistry(registryId: string) {
+
+    const registry = await SchemaRegistry.findOne({id: registryId});
+    if (!registry) {
+        throw("Registry not existed!");
+    }
+
+    const numClaims = await Claim.countDocuments({"schemaRegistryId": registry.id});
+    const schema = await Schema.findOne({"@hash": registry.schemaHash});
+
+    let response = {
+        id: registry.id,
+        schema: {
+            name: schema!["@name"],
+            hash: schema!["@hash"]
+        },
+        issuerId: registry.issuerId,
+        description: registry.description,
+        expiration: registry.expiration,
+        updatable: registry.updatable,
+        network: {
+            networkId: 97,
+            name: 'BNB Testnet'
+        },
+        endpointUrl: registry.endpointUrl,
+        isActive: registry.isActive,
+        numClaims: numClaims
+    };
+
+    return response;
+}
+
 export async function updateRegistry(registryId: string, schemaHash: string, issuerId: string, description: string, expiration: number, updateble: boolean, networkId: number, endpointUrl: string) {
     const registry = await SchemaRegistry.findOne({id: registryId});
     if (!registry) {

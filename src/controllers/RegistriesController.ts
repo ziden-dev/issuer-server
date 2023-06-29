@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { buildErrorMessage, buildResponse } from "../common/APIBuilderResponse.js";
 import { ExceptionMessage } from "../common/enum/ExceptionMessages.js";
 import { ResultMessage } from "../common/enum/ResultMessages.js";
-import { changeStatusRegistry, createNewRegistry, findSchemaRegistry, updateRegistry } from "../services/RegistryService.js";
+import { changeStatusRegistry, createNewRegistry, findOneRegistry, findSchemaRegistry, updateRegistry } from "../services/RegistryService.js";
 
 export class RegistriesController {
     public async registerNewSchemaRegistry(req: Request, res: Response) {
@@ -35,6 +35,21 @@ export class RegistriesController {
             }
 
             const registries = await findSchemaRegistry(schemaHash, issuerId);
+            res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registries, ResultMessage.APISUCCESS.message));
+
+        } catch (err: any) {
+            console.log(err);
+            res.status(400).send(buildErrorMessage(ExceptionMessage.UNKNOWN.apiCode, err, ExceptionMessage.UNKNOWN.message));
+        }
+    }
+
+    public async findOne(req: Request, res: Response) {
+        try {
+            let {registryId} = req.params;
+            if (!registryId) {
+                throw("required registry Id");
+            }
+            const registries = await findOneRegistry(registryId);
             res.send(buildResponse(ResultMessage.APISUCCESS.apiCode, registries, ResultMessage.APISUCCESS.message));
 
         } catch (err: any) {

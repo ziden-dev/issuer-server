@@ -950,43 +950,32 @@
       }
     },
     "/api/v1/registries/{registryId}": {
-      "put": {
-        "operationId": "registries-3",
+      "get": {
+        "operationId": "registries-2",
         "security": [],
         "tags": [
           "registries"
         ],
-        "summary": "Update Registry",
-        "description": "Update Registry Service",
+        "summary": "Find Registry Service",
+        "description": "Find Registry Service by SchemaHash, IssuerId or NetworkId",
         "parameters": [
           {
             "name": "registryId",
             "in": "path",
-            "description": "Id of Registry service",
-            "required": true,
+            "description": "id of registry",
             "schema": {
               "type": "string",
-              "example": "id1234"
+              "example": "123456789"
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Registry"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "Success response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Registry"
+                  "$ref": "#/components/schemas/QueryRegistryResponse"
                 }
               }
             }
