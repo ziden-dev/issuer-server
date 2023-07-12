@@ -44,7 +44,6 @@ http[s]:<hostname>[:<port>]/api-docs
 
 | Name                              | Description |
 | --------------------------------- | ----------- |
-| **level_db_*/**                   | Fast key-value storage to store your trees |
 | **logs/**                         | Logs of the running process  |
 | **src/**                          | Source files |
 | **src/common/**                   | Setup common variables and functions |
